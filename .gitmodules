@@ -1,7 +1,3 @@
-[submodule "libs/FrostCore"]
-	path = libs/FrostCore
-	url = https://github.com/FrostlessNetwork/FrostCore.git
-	branch = master
 [submodule "libs/BukkitAPI"]
 	path = libs/BukkitAPI
 	url = https://github.com/FrostlessNetwork/BukkitAPI.git
