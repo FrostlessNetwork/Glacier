@@ -1,9 +1,6 @@
 package network.frostless.glacier.user;
 
-import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Table;
-import com.google.common.collect.Tables;
 import com.google.gson.Gson;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
