@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import network.frostless.bukkitapi.FrostbiteAPI;
 import network.frostless.glacier.app.GlacierCoreGameLoader;
+import network.frostless.glacier.user.UserManagerImpl;
 import network.frostless.glacierapi.user.GameUser;
 import network.frostless.glacierapi.user.UserManager;
 import network.frostless.glacierapi.user.loader.UserDataLoader;
@@ -31,7 +32,7 @@ public class Glacier<T extends GameUser> {
 
     /* Internal Loading */
     @Setter
-    private GlacierCoreGameLoader<?> plugin;
+    private GlacierCoreGameLoader<T> plugin;
 
     private UserManager userManager;
     private UserDataLoader<T> userDataLoader;
@@ -43,6 +44,8 @@ public class Glacier<T extends GameUser> {
         logger.info("Glacier API loading...");
         final long start = System.currentTimeMillis();
         initializeDependencies();
+
+        userManager = new UserManagerImpl<>(frostbite);
 
         logger.info("Glacier API loaded in " + (System.currentTimeMillis() - start) + "ms");
     }
@@ -56,7 +59,6 @@ public class Glacier<T extends GameUser> {
         /* AdvancedSlimeWorldManager */
         slimePlugin = (SlimePlugin) Bukkit.getPluginManager().getPlugin("SlimeWorldManager");
         Preconditions.checkNotNull(slimePlugin, "SlimeWorldManager is not installed! Please install it to use Glacier!");
-
     }
 
     public static Glacier<?> get() {
