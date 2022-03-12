@@ -26,9 +26,9 @@ public class Glacier<T extends GameUser> {
     private static final Logger logger = LogManager.getLogger("Glacier");
 
     /* Glacier Dependencies */
-    private static FrostbiteAPI frostbite;
+    private FrostbiteAPI frostbite;
 
-    private static SlimePlugin slimePlugin;
+    private SlimePlugin slimePlugin;
 
     /* Internal Loading */
     @Setter
@@ -62,14 +62,13 @@ public class Glacier<T extends GameUser> {
     }
 
     public static Glacier<?> get() {
-        if (instance == null) {
-            instance = new Glacier<>();
-        }
+        if (instance == null) instance = new Glacier<>();
+
         return instance;
     }
 
     @SuppressWarnings("unchecked")
     public static <V extends GameUser> Glacier<V> get(Class<V> clazz) {
-        return (Glacier<V>) get();
+        return (Glacier<V>) clazz.cast(get());
     }
 }

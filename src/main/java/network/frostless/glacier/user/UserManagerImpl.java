@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.support.ConnectionSource;
+import com.j256.ormlite.table.TableUtils;
 import io.lettuce.core.RedisFuture;
 import lombok.SneakyThrows;
 import network.frostless.bukkitapi.FrostbiteAPI;
@@ -89,7 +90,7 @@ public class UserManagerImpl<T extends GameUser> implements UserManager {
         Class<T> userClass = (Class<T>) Glacier.get().getUserDataLoader().getUserClass();
         try {
             userDao = DaoManager.createDao(connectionSource, userClass);
-
+            if(!userDao.isTableExists()) TableUtils.createTable(connectionSource, userClass);
 
         } catch (SQLException e) {
             e.printStackTrace();
