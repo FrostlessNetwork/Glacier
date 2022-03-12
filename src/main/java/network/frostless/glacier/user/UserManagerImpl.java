@@ -41,6 +41,7 @@ public class UserManagerImpl<T extends GameUser> implements UserManager {
         this.frostbite = frostbite;
         this.connectionSource = frostbite.getUserManager().getConnectionSource();
 
+        Glacier.getPlugin().registerListeners(new UserLoginListener());
         registerConnection();
     }
 

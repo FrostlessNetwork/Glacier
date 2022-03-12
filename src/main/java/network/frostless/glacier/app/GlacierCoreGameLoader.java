@@ -1,15 +1,16 @@
 package network.frostless.glacier.app;
 
+import network.frostless.bukkitapi.SpigotCoreLoader;
 import network.frostless.glacier.Glacier;
 import network.frostless.glacierapi.user.GameUser;
 import network.frostless.glacierapi.user.loader.UserDataLoader;
-import org.bukkit.plugin.java.JavaPlugin;
 
-public abstract class GlacierCoreGameLoader<User extends GameUser> extends JavaPlugin implements UserDataLoader<User> {
+public abstract class GlacierCoreGameLoader<User extends GameUser> extends SpigotCoreLoader implements UserDataLoader<User> {
 
     protected void initGlacier() {
+        Glacier.setPlugin(this);
+        //
         Glacier<User> glacierAPI = Glacier.get(getUserClass());
-        glacierAPI.setPlugin(this);
         glacierAPI.setUserDataLoader(this);
     }
 

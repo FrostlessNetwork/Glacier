@@ -31,8 +31,8 @@ public class Glacier<T extends GameUser> {
     private SlimePlugin slimePlugin;
 
     /* Internal Loading */
-    @Setter
-    private GlacierCoreGameLoader<T> plugin;
+    @Setter @Getter
+    private static GlacierCoreGameLoader<?> plugin;
 
     private UserManager userManager;
     private UserDataLoader<T> userDataLoader;
@@ -43,6 +43,7 @@ public class Glacier<T extends GameUser> {
     private Glacier() {
         logger.info("Glacier API loading...");
         final long start = System.currentTimeMillis();
+        if(plugin == null) throw new RuntimeException("Glacier is not loaded! Please do Glacier.setPlugin(plugin) before loading!");
         initializeDependencies();
 
         userManager = new UserManagerImpl<>(frostbite);
