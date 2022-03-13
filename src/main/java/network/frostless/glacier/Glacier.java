@@ -35,18 +35,22 @@ public class Glacier<T extends GameUser> {
     private static GlacierCoreGameLoader<?> plugin;
 
     private UserManager userManager;
-    private UserDataLoader<T> userDataLoader;
+    private UserDataLoader<?> userDataLoader;
 
     /* Games API */
 
 
     private Glacier() {
+        instance = this;
         logger.info("Glacier API loading...");
         final long start = System.currentTimeMillis();
         if(plugin == null) throw new RuntimeException("Glacier is not loaded! Please do Glacier.setPlugin(plugin) before loading!");
         initializeDependencies();
 
-        userManager = new UserManagerImpl<>(frostbite);
+        setUserDataLoader(plugin);
+        setUserManager(new UserManagerImpl<>(frostbite));
+
+        userManager.registerConnection();
 
         logger.info("Glacier API loaded in " + (System.currentTimeMillis() - start) + "ms");
     }
@@ -70,6 +74,6 @@ public class Glacier<T extends GameUser> {
 
     @SuppressWarnings("unchecked")
     public static <V extends GameUser> Glacier<V> get(Class<V> clazz) {
-        return (Glacier<V>) clazz.cast(get());
+        return (Glacier<V>) get();
     }
 }

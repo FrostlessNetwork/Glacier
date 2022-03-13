@@ -9,16 +9,14 @@ public abstract class GlacierCoreGameLoader<User extends GameUser> extends Spigo
 
     protected void initGlacier() {
         Glacier.setPlugin(this);
-        //
+
         Glacier<User> glacierAPI = Glacier.get(getUserClass());
-        glacierAPI.setUserDataLoader(this);
     }
 
 
 
     @Override
     public void onEnable() {
-        super.onEnable();
         initGlacier();
         init();
     }
