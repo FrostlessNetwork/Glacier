@@ -17,7 +17,6 @@ public abstract class GameUserImpl extends DataGameUserImpl implements GameUser 
     private transient UserGameState userState;
 
 
-
     public GameUserImpl() {}
 
     public GameUserImpl(UUID uuid) {

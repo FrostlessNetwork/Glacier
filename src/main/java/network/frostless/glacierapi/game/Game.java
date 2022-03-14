@@ -8,5 +8,6 @@ public interface Game extends Minigame {
     GameState getGameState();
     void setGameState(GameState state);
 
-
+    long getStartTime();
+    void setStartTime(long time);
 }

@@ -10,4 +10,9 @@ import java.util.Map;
 public class GameManagerImpl implements GameManager {
 
     private final Map<String, Object> games = Maps.newConcurrentMap();
+
+
+    public GameManagerImpl() {}
+
+
 }
