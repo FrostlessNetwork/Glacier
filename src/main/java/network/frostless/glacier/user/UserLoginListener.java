@@ -8,9 +8,12 @@ import network.frostless.glacier.Glacier;
 import network.frostless.glacierapi.user.loader.UserLoaderResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.concurrent.*;
@@ -48,9 +51,23 @@ public class UserLoginListener implements Listener {
     }
 
 
-    @EventHandler
-    public void onJoin(UserLoginEvent event) {
-        Glacier.get().getUserManager().loadUser(event.getPlayer());
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onLogin(UserLoginEvent event) {
+        Glacier.get().getUserManager().loadUser(event.getPlayer(), event.getUser());
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        event.getPlayer().teleportAsync(new Location(Bukkit.getWorld("ptbl-slime"), 26, 12, -26)).whenComplete((v, err) -> {
+            if (err != null) {
+                logger.error("Error teleporting player to spawn: {}", err.getMessage());
+            }
+            if(v) {
+                logger.info("Player " + event.getPlayer().getName() + " has been teleported to spawn.");
+            } else {
+                logger.warn("Player " + event.getPlayer().getName() + " could not be teleported to spawn.");
+            }
+        });
     }
 
 

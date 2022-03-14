@@ -86,7 +86,7 @@ public class UserManagerImpl<T extends GameUser> implements UserManager {
 
     @Override
     @SuppressWarnings("unchecked")
-    public void loadUser(Player player) {
+    public void loadUser(Player player, GlobalUser globalUser) {
         if (userCache.containsKey(player.getUniqueId())) return;
 
         String gameIdentifier = loadCache.getIfPresent(player.getUniqueId());
@@ -100,6 +100,8 @@ public class UserManagerImpl<T extends GameUser> implements UserManager {
 
         T user = (T) Glacier.get().getUserDataLoader().createUser(player.getName(), player.getUniqueId());
         user.setGameIdentifier(gameIdentifier);
+        user.setId(globalUser.getId());
+        user.setGlobalUser(globalUser);
 
         loadCache.invalidate(player.getUniqueId());
         userCache.put(player.getUniqueId(), Maps.immutableEntry(user, gameIdentifier));

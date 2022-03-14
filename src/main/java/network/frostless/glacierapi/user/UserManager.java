@@ -14,7 +14,7 @@ public interface UserManager {
      * @param player The player to load
      * @implNote This method is SYNC.
      */
-    void loadUser(Player player);
+    void loadUser(Player player, GlobalUser user);
 
     /**
      * Called when a user disconnects.
