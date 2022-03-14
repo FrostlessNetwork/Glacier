@@ -1,15 +1,20 @@
 package network.frostless.glacierapi.user;
 
 import network.frostless.frostentities.entity.GlobalUser;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
-public interface GameUser {
+public interface GameUser extends DataGameUser {
 
-    long getId();
-    void setId(long id);
 
     String getGameIdentifier();
     void setGameIdentifier(String identifier);
 
     GlobalUser getGlobalUser();
     void setGlobalUser(GlobalUser globalUser);
+
+
+    default Player getPlayer() {
+        return Bukkit.getPlayer(this.getUuid());
+    }
 }
