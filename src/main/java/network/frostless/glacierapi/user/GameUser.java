@@ -20,4 +20,8 @@ public interface GameUser extends DataGameUser {
     default Player getPlayer() {
         return Bukkit.getPlayer(this.getUuid());
     }
+
+    default boolean isInLobby() {
+        return getUserState() == UserGameState.LOBBY;
+    }
 }

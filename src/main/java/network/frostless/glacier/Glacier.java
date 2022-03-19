@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import network.frostless.bukkitapi.FrostbiteAPI;
 import network.frostless.glacier.app.GlacierCoreGameLoader;
+import network.frostless.glacier.lobby.Lobby;
 import network.frostless.glacier.slime.WorldManager;
 import network.frostless.glacier.user.UserManagerImpl;
 import network.frostless.glacierapi.slime.SlimeAPI;
@@ -46,6 +47,7 @@ public class Glacier<T extends GameUser> {
 
     /* Games API */
     private SlimeAPI worldManager;
+    private Lobby lobby;
 
 
     private Glacier() {

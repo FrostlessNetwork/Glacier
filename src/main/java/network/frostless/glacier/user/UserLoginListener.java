@@ -5,6 +5,8 @@ import net.kyori.adventure.text.format.TextColor;
 import network.frostless.bukkitapi.events.AsyncUserLoginEvent;
 import network.frostless.bukkitapi.events.UserLoginEvent;
 import network.frostless.glacier.Glacier;
+import network.frostless.glacierapi.events.game.LobbyJoinEvent;
+import network.frostless.glacierapi.user.GameUser;
 import network.frostless.glacierapi.user.loader.UserLoaderResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -58,16 +60,7 @@ public class UserLoginListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onPlayerJoin(PlayerJoinEvent event) {
-        event.getPlayer().teleportAsync(new Location(Bukkit.getWorld("ptbl-slime"), 26, 12, -26)).whenComplete((v, err) -> {
-            if (err != null) {
-                logger.error("Error teleporting player to spawn: {}", err.getMessage());
-            }
-            if(v) {
-                logger.info("Player " + event.getPlayer().getName() + " has been teleported to spawn.");
-            } else {
-                logger.warn("Player " + event.getPlayer().getName() + " could not be teleported to spawn.");
-            }
-        });
+        Bukkit.getPluginManager().callEvent(new LobbyJoinEvent(Users.getUser(event.getPlayer().getUniqueId(), GameUser.class)));
     }
 
 
