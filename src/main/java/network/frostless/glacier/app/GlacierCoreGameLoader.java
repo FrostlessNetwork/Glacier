@@ -7,13 +7,23 @@ import network.frostless.glacierapi.user.loader.UserDataLoader;
 
 public abstract class GlacierCoreGameLoader<User extends GameUser> extends SpigotCoreLoader implements UserDataLoader<User> {
 
+
+    protected Glacier<User> glacierAPI;
+
     protected void initGlacier() {
         Glacier.setPlugin(this);
 
-        Glacier<User> glacierAPI = Glacier.get(getUserClass());
+        refreshConfigurations();
+
+        glacierAPI = Glacier.get(getUserClass());
     }
 
 
+    public void refreshConfigurations() {
+        saveDefaultConfig();
+        getConfig().options().copyDefaults(true);
+        saveConfig();
+    }
 
     @Override
     public void onEnable() {
