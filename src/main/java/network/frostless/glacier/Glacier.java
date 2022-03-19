@@ -32,6 +32,8 @@ import java.util.concurrent.ExecutionException;
 public class Glacier<T extends GameUser> {
 
     private static Glacier<?> instance;
+
+    @Getter
     private static final Logger logger = LogManager.getLogger("Glacier");
 
     /* Glacier Dependencies */
