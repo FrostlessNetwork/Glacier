@@ -7,9 +7,11 @@ import lombok.Getter;
 import lombok.Setter;
 import network.frostless.bukkitapi.FrostbiteAPI;
 import network.frostless.glacier.app.GlacierCoreGameLoader;
+import network.frostless.glacier.game.GameManagerImpl;
 import network.frostless.glacier.lobby.Lobby;
 import network.frostless.glacier.slime.WorldManager;
 import network.frostless.glacier.user.UserManagerImpl;
+import network.frostless.glacierapi.game.manager.GameManager;
 import network.frostless.glacierapi.slime.SlimeAPI;
 import network.frostless.glacierapi.user.GameUser;
 import network.frostless.glacierapi.user.UserManager;
@@ -46,7 +48,10 @@ public class Glacier<T extends GameUser> {
     private UserDataLoader<?> userDataLoader;
 
     /* Games API */
+    private GameManager gameManager;
+
     private SlimeAPI worldManager;
+
     private Lobby lobby;
 
 
@@ -65,6 +70,7 @@ public class Glacier<T extends GameUser> {
 
         // Games API setup
         worldManager = new WorldManager(slimePlugin);
+        gameManager = new GameManagerImpl();
 
         // Load secondary
         loadSecondary();
