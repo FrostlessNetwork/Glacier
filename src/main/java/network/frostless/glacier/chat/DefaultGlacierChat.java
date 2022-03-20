@@ -21,6 +21,7 @@ public class DefaultGlacierChat implements ChatRenderer, ViewerFilter {
 
         List<GameUser> gameUsers = Glacier.get().getGameManager().usersIn(user.getGameIdentifier());
 
+        return Component.empty();
     }
 
     @Override
