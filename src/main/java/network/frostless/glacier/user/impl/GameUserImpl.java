@@ -9,12 +9,14 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public abstract class GameUserImpl extends DataGameUserImpl implements GameUser {
+public abstract class GameUserImpl extends DataGameUserImpl {
 
     // Transient, no saves
     private transient String gameIdentifier;
 
     private transient UserGameState userState;
+
+    private transient String rank;
 
 
     public GameUserImpl() {}

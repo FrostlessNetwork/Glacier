@@ -15,6 +15,7 @@ import network.frostless.glacier.chat.AbstractChat;
 import network.frostless.glacier.chat.DefaultGlacierChat;
 import network.frostless.glacier.game.GameManagerImpl;
 import network.frostless.glacier.lobby.Lobby;
+import network.frostless.glacier.rank.RankManager;
 import network.frostless.glacier.scoreboard.Scoreboards;
 import network.frostless.glacier.slime.WorldManager;
 import network.frostless.glacier.user.UserManagerImpl;
@@ -32,6 +33,9 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * The entry point to the minigames API.
@@ -46,6 +50,8 @@ public class Glacier<T extends GameUser> {
 
     @Getter
     private static final Logger logger = LogManager.getLogger("Glacier");
+
+    private final Executor executorService = Executors.newCachedThreadPool(r -> new Thread(r, "Glacier-Thread"));
 
     /* Glacier Dependencies */
     private FrostbiteAPI frostbite;
@@ -86,6 +92,7 @@ public class Glacier<T extends GameUser> {
         userManager.registerConnection();
 
         // Games API setup
+        executorService.execute(RankManager::fetchAllRanks);
         worldManager = new WorldManager(slimePlugin);
         gameManager = new GameManagerImpl();
         scoreboardManager = new Scoreboards();

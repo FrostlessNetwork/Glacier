@@ -24,8 +24,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissionAttachment;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -74,7 +79,7 @@ public class UserManagerImpl<T extends GameUser> implements UserManager {
                     logger.debug("Debug user object: {}", userObject);
 
                     // check if games map has the user's identifier
-                    if(!Glacier.get().getGameManager().hasGame(userObject.getGameIdentifier())) {
+                    if (!Glacier.get().getGameManager().hasGame(userObject.getGameIdentifier())) {
                         logger.warn("User {} tried to join with a invalid game identifier. Denying...", user.getUuid());
                         future.complete(UserLoaderResult.DENIED);
                         return;
@@ -105,6 +110,30 @@ public class UserManagerImpl<T extends GameUser> implements UserManager {
         user.setId(globalUser.getId());
         user.setGlobalUser(globalUser);
 
+        try (Connection connection = connectionSource.getReadOnlyConnection("luckperms_group_permissions").getUnderlyingConnection()) {
+            Map<String, Boolean> groupPermissions = Maps.newHashMap();
+
+            // mmm good sql query to get permissions : ) - RiceCX
+            try (PreparedStatement statement = connection.prepareStatement("SELECT v.* FROM luckperms_group_permissions AS v JOIN (SELECT LTRIM(t.permission, 'group.') FROM (SELECT permission from luckperms_user_permissions WHERE uuid=? AND permission LIKE 'group.%') t) AS tc ON v.name=tc.ltrim")) {
+                statement.setString(1, user.getUuid().toString());
+
+                ResultSet resultSet = statement.executeQuery();
+
+                while (resultSet.next()) {
+                    String rankName = resultSet.getString("name");
+                    if(user.getRank() == null && !rankName.equalsIgnoreCase("default")) user.setRank(rankName);
+                    groupPermissions.put(resultSet.getString("permission"), resultSet.getBoolean("value"));
+                }
+            }
+
+            PermissionAttachment permissionAttachment = player.addAttachment(Glacier.getPlugin());
+            groupPermissions.forEach(permissionAttachment::setPermission);
+
+            logger.info("Loaded permissions for {}", user.getUuid());
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        }
+
         loadCache.invalidate(player.getUniqueId());
         userCache.put(player.getUniqueId(), Maps.immutableEntry(user, gameIdentifier));
     }
@@ -115,7 +144,7 @@ public class UserManagerImpl<T extends GameUser> implements UserManager {
         logger.info("Handling disconnect for {}", player.getName());
         Map.Entry<? extends GameUser, String> user = userCache.get(player.getUniqueId());
 
-        if(user == null) return;
+        if (user == null) return;
 
         try {
             userDao.createOrUpdate((T) user.getKey());
@@ -152,5 +181,10 @@ public class UserManagerImpl<T extends GameUser> implements UserManager {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public Connection getConnection() throws SQLException {
+        return connectionSource.getReadOnlyConnection("luckperms_group_permissions").getUnderlyingConnection();
     }
 }

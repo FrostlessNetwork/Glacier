@@ -1,12 +1,16 @@
 package network.frostless.glacierapi.user;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import network.frostless.frostentities.entity.GlobalUser;
+import network.frostless.glacier.rank.RankManager;
 import network.frostless.glacierapi.game.data.UserGameState;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public interface GameUser extends DataGameUser {
 
+    MiniMessage minimessage = MiniMessage.miniMessage();
 
     String getGameIdentifier();
     void setGameIdentifier(String identifier);
@@ -16,6 +20,13 @@ public interface GameUser extends DataGameUser {
 
     UserGameState getUserState();
     void setUserState(UserGameState state);
+
+    String getRank();
+    void setRank(String rank);
+
+    default Component getRankDisplay() {
+        return minimessage.deserialize(RankManager.getRank(getRank()));
+    }
 
     default Player getPlayer() {
         return Bukkit.getPlayer(this.getUuid());

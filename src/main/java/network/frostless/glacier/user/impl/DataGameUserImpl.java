@@ -4,11 +4,12 @@ import com.j256.ormlite.field.DatabaseField;
 import lombok.Data;
 import network.frostless.frostentities.entity.GlobalUser;
 import network.frostless.glacierapi.user.DataGameUser;
+import network.frostless.glacierapi.user.GameUser;
 
 import java.util.UUID;
 
 @Data
-public abstract class DataGameUserImpl implements DataGameUser {
+public abstract class DataGameUserImpl implements GameUser {
 
     @DatabaseField(id = true)
     private long id;

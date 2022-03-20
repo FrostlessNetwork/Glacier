@@ -19,6 +19,7 @@ public class DefaultGlacierChat extends AbstractChat {
 
         return Component
                 .space()
+                .append(user.getRankDisplay())
                 .append(sourceDisplayName)
                 .append(Component.space())
                 .append(Component.text("[" + user.getGameIdentifier() + "]").color(TextColor.color(0xFFACB)))
@@ -36,11 +37,7 @@ public class DefaultGlacierChat extends AbstractChat {
             if(viewer instanceof Player) {
                 final GameUser user = Users.getUser(((Player) viewer).getUniqueId(), GameUser.class);
                 return !user.getGameIdentifier().equals(sourceUser.getGameIdentifier());
-            } else if(viewer instanceof ConsoleCommandSender) {
-                return false;
-            } else {
-                return true;
-            }
+            } else return !(viewer instanceof ConsoleCommandSender);
         });
 
         return viewers;
