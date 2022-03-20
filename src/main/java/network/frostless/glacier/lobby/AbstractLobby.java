@@ -4,9 +4,11 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import network.frostless.glacier.Glacier;
 import network.frostless.glacier.user.Users;
+import network.frostless.glacier.utils.LazyLocation;
 import network.frostless.glacierapi.events.game.LobbyJoinEvent;
 import network.frostless.glacierapi.game.data.UserGameState;
 import network.frostless.glacierapi.user.GameUser;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -16,6 +18,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.concurrent.ExecutorService;
@@ -26,15 +29,23 @@ public abstract class AbstractLobby implements Listener, Lobby {
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    protected Location location;
+    protected LazyLocation lazyLocation;
+
+    private Location cachedLocation;
 
     /**
      * Constructs a new lobby with the provided world and location.
      *
      * @param spawn The location of the lobby.
      */
+    public AbstractLobby(LazyLocation spawn) {
+        this.lazyLocation = spawn;
+        Glacier.getPlugin().registerListeners(this);
+    }
+
     public AbstractLobby(Location spawn) {
-        this.location = spawn;
+        this.cachedLocation = spawn;
+
         Glacier.getPlugin().registerListeners(this);
     }
 
@@ -42,7 +53,14 @@ public abstract class AbstractLobby implements Listener, Lobby {
 
     @EventHandler
     public void onPlayerJoin(LobbyJoinEvent event) {
-        onLobbyJoin(event);
+        event.getGameUser().setUserState(UserGameState.LOBBY);
+        event.getGameUser().getPlayer().teleportAsync(getRealLocation()).whenComplete((success, err) -> Bukkit.getScheduler().runTask(Glacier.getPlugin(), () -> {
+            final Player player = event.getGameUser().getPlayer();
+            player.setGameMode(GameMode.SURVIVAL);
+            player.setFoodLevel(20);
+            player.setHealth(20);
+            onLobbyJoin(event);
+        }));
     }
 
     @EventHandler
@@ -51,18 +69,22 @@ public abstract class AbstractLobby implements Listener, Lobby {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerDeath(EntityDamageEvent evt) {
-        if (evt.getEntity() instanceof Player player) {
-            GameUser user = Users.getUser(player.getUniqueId(), GameUser.class);
-            if (user != null && user.getUserState() != UserGameState.LOBBY) return;
+    public void onDamage(EntityDamageEvent evt) {
+        if (evt.getEntity() instanceof Player player && isLobbyUser(player)) {
 
             if (evt.getCause() == EntityDamageEvent.DamageCause.VOID) {
-                executor.submit(() -> {
-                    evt.getEntity().sendMessage(Component.text("No dying for you!").color(TextColor.color(0xAFFC09)));
-                    evt.getEntity().teleportAsync(location).join();
-                });
+                evt.getEntity().teleport(getRealLocation());
+                evt.getEntity().sendMessage(Component.text("No dying for you!").color(TextColor.color(0xAFFC09)));
             }
+
         }
+    }
+
+    @EventHandler
+    public void onDeath(PlayerDeathEvent event) {
+        if(!isLobbyUser(event.getEntity())) return;
+        event.setCancelled(true);
+        event.getPlayer().teleport(getRealLocation());
     }
 
     @EventHandler
@@ -73,7 +95,8 @@ public abstract class AbstractLobby implements Listener, Lobby {
 
     @EventHandler
     public void onPlayerHunger(FoodLevelChangeEvent event) {
-        if (event.getEntity() instanceof Player player) if (isLobbyUser(player)) event.setCancelled(true);
+        if (event.getEntity() instanceof Player player && isLobbyUser(player))
+            event.setCancelled(true);
     }
 
     private boolean isLobbyUser(Player player) {
@@ -81,5 +104,15 @@ public abstract class AbstractLobby implements Listener, Lobby {
         if (user == null) return false;
 
         return user.isInLobby();
+    }
+
+    private Location getRealLocation() {
+        if (cachedLocation == null) cachedLocation = lazyLocation.location();
+
+        if (lazyLocation != null && !lazyLocation.location().equals(cachedLocation)) {
+            cachedLocation = lazyLocation.location();
+        }
+
+        return cachedLocation;
     }
 }

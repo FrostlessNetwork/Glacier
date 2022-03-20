@@ -4,6 +4,7 @@ import network.frostless.glacier.team.Team;
 import network.frostless.glacierapi.game.Game;
 import network.frostless.glacierapi.user.GameUser;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -20,5 +21,10 @@ public interface GameManager {
      */
     <U extends GameUser, T extends Team<U>> CompletableFuture<String> createGame(Game<U, T> game);
 
+    List<GameUser> usersIn(String identifier);
+
+    void adjustVisibility(GameUser origin);
+
+    boolean hasGame(String identifier);
 
 }

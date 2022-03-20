@@ -15,29 +15,33 @@ import net.kyori.adventure.text.format.TextColor;
 import network.frostless.bukkitapi.FrostbiteAPI;
 import network.frostless.frostentities.entity.GlobalUser;
 import network.frostless.glacier.Glacier;
+import network.frostless.glacierapi.events.user.UserJoinEvent;
 import network.frostless.glacierapi.user.GameUser;
 import network.frostless.glacierapi.user.UserManager;
 import network.frostless.glacierapi.user.loader.UserLoaderResult;
 import network.frostless.serverapi.data.UserObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class UserManagerImpl<T extends GameUser> implements UserManager {
 
-    private final Logger logger = LogManager.getLogger();
+    private final Logger logger = LogManager.getLogger("Glacier User Manager");
 
     private final FrostbiteAPI frostbite;
     private final Gson gson = new Gson();
 
     private final Cache<UUID, String> loadCache = CacheBuilder.newBuilder().maximumSize(100).expireAfterWrite(1, TimeUnit.MINUTES).build();
-    private final Map<UUID, Map.Entry<T, String>> userCache = Maps.newConcurrentMap();
+    private final Map<UUID, Map.Entry<? extends GameUser, String>> userCache = Maps.newConcurrentMap();
 
 
     private final ConnectionSource connectionSource;
@@ -58,17 +62,11 @@ public class UserManagerImpl<T extends GameUser> implements UserManager {
         RedisFuture<String> userObjectFuture = frostbite.getRedis().async().hget("users", user.getUuid().toString());
 
         userObjectFuture
-                .thenApply((c) -> {
-                    logger.info("User object received. Attempting to deserialize...");
-                    return gson.fromJson(c, UserObject.class);
-                })
-                .exceptionally(c -> {
-                    logger.info("User object not found. Denying...");
-                    return null;
-                })
+                .thenApply((c) -> gson.fromJson(c, UserObject.class))
+                .exceptionally(c -> null)
                 .whenComplete((userObject, err) -> {
                     if (userObject == null || userObject.getGameIdentifier() == null) {
-                        logger.info("User {} has no game object. Denying...", user.getUuid());
+                        logger.warn("User {} has no game object. Denying...", user.getUuid());
                         future.complete(UserLoaderResult.DENIED);
                         return;
                     }
@@ -76,6 +74,11 @@ public class UserManagerImpl<T extends GameUser> implements UserManager {
                     logger.debug("Debug user object: {}", userObject);
 
                     // check if games map has the user's identifier
+                    if(!Glacier.get().getGameManager().hasGame(userObject.getGameIdentifier())) {
+                        logger.warn("User {} tried to join with a invalid game identifier. Denying...", user.getUuid());
+                        future.complete(UserLoaderResult.DENIED);
+                        return;
+                    }
 
                     loadCache.put(user.getUuid(), userObject.getGameIdentifier());
                     future.complete(UserLoaderResult.ALLOWED);
@@ -85,7 +88,6 @@ public class UserManagerImpl<T extends GameUser> implements UserManager {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void loadUser(Player player, GlobalUser globalUser) {
         if (userCache.containsKey(player.getUniqueId())) return;
 
@@ -98,7 +100,7 @@ public class UserManagerImpl<T extends GameUser> implements UserManager {
             return;
         }
 
-        T user = (T) Glacier.get().getUserDataLoader().createUser(player.getName(), player.getUniqueId());
+        GameUser user = Glacier.get().getUserDataLoader().createUser(player.getName(), player.getUniqueId());
         user.setGameIdentifier(gameIdentifier);
         user.setId(globalUser.getId());
         user.setGlobalUser(globalUser);
@@ -108,14 +110,15 @@ public class UserManagerImpl<T extends GameUser> implements UserManager {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void unloadUser(Player player) {
         logger.info("Handling disconnect for {}", player.getName());
-        Map.Entry<T, String> user = userCache.get(player.getUniqueId());
+        Map.Entry<? extends GameUser, String> user = userCache.get(player.getUniqueId());
 
         if(user == null) return;
 
         try {
-            userDao.createOrUpdate(user.getKey());
+            userDao.createOrUpdate((T) user.getKey());
         } catch (SQLException e) {
             logger.error("Failed to save user {}", player.getName());
             e.printStackTrace();
@@ -126,8 +129,14 @@ public class UserManagerImpl<T extends GameUser> implements UserManager {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <V> V getOrCreate(UUID uuid) {
-        return null;
+        return (V) userCache.get(uuid).getKey();
+    }
+
+    @Override
+    public List<GameUser> getUsers() {
+        return userCache.values().stream().map(Map.Entry::getKey).collect(Collectors.toList());
     }
 
     /**

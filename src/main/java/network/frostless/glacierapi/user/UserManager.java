@@ -4,6 +4,7 @@ import network.frostless.frostentities.entity.GlobalUser;
 import network.frostless.glacierapi.user.loader.UserLoaderResult;
 import org.bukkit.entity.Player;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -24,6 +25,8 @@ public interface UserManager {
     void unloadUser(Player player);
 
     <T> T getOrCreate(UUID uuid);
+
+    List<GameUser> getUsers();
 
     void registerConnection();
 

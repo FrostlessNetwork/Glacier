@@ -3,14 +3,21 @@ package network.frostless.glacier;
 import com.google.common.base.Preconditions;
 import com.grinderwolf.swm.api.SlimePlugin;
 import com.grinderwolf.swm.api.world.SlimeWorld;
+import io.papermc.paper.chat.ChatRenderer;
 import lombok.Getter;
 import lombok.Setter;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
 import network.frostless.bukkitapi.FrostbiteAPI;
 import network.frostless.glacier.app.GlacierCoreGameLoader;
 import network.frostless.glacier.game.GameManagerImpl;
 import network.frostless.glacier.lobby.Lobby;
+import network.frostless.glacier.scoreboard.Scoreboards;
 import network.frostless.glacier.slime.WorldManager;
 import network.frostless.glacier.user.UserManagerImpl;
+import network.frostless.glacier.user.Users;
+import network.frostless.glacier.utils.LazyLocation;
 import network.frostless.glacierapi.game.manager.GameManager;
 import network.frostless.glacierapi.slime.SlimeAPI;
 import network.frostless.glacierapi.user.GameUser;
@@ -19,6 +26,8 @@ import network.frostless.glacierapi.user.loader.UserDataLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.ExecutionException;
 
@@ -54,6 +63,8 @@ public class Glacier<T extends GameUser> {
 
     private SlimeAPI worldManager;
 
+    private Scoreboards scoreboardManager;
+
     private Lobby lobby;
 
 
@@ -73,6 +84,18 @@ public class Glacier<T extends GameUser> {
         // Games API setup
         worldManager = new WorldManager(slimePlugin);
         gameManager = new GameManagerImpl();
+        scoreboardManager = new Scoreboards();
+        frostbite.getChatManager().setChatRenderer((source, sourceDisplayName, message, viewer) -> {
+            GameUser user = Users.getUser(source.getUniqueId(), GameUser.class);
+
+            return Component
+                    .space()
+                    .append(sourceDisplayName)
+                    .append(Component.space())
+                    .append(Component.text("[" + user.getGameIdentifier() + "]").color(TextColor.color(0xFFACB)))
+                    .append(Component.space())
+                    .append(message);
+        });
 
         // Load secondary
         loadSecondary();

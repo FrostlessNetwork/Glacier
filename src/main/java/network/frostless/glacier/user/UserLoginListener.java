@@ -6,6 +6,7 @@ import network.frostless.bukkitapi.events.AsyncUserLoginEvent;
 import network.frostless.bukkitapi.events.UserLoginEvent;
 import network.frostless.glacier.Glacier;
 import network.frostless.glacierapi.events.game.LobbyJoinEvent;
+import network.frostless.glacierapi.events.user.UserJoinEvent;
 import network.frostless.glacierapi.user.GameUser;
 import network.frostless.glacierapi.user.loader.UserLoaderResult;
 import org.apache.logging.log4j.LogManager;
@@ -22,7 +23,7 @@ import java.util.concurrent.*;
 
 public class UserLoginListener implements Listener {
 
-    private final Logger logger = LogManager.getLogger();
+    private final Logger logger = LogManager.getLogger("Glacier User Loader");
     private final ExecutorService executorService = Executors.newCachedThreadPool(r -> new Thread(r, "Glacier-User-Loader"));
 
     @EventHandler
@@ -60,7 +61,9 @@ public class UserLoginListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onPlayerJoin(PlayerJoinEvent event) {
-        Bukkit.getPluginManager().callEvent(new LobbyJoinEvent(Users.getUser(event.getPlayer().getUniqueId(), GameUser.class)));
+        GameUser user = Users.getUser(event.getPlayer().getUniqueId(), GameUser.class);
+        Glacier.get().getGameManager().adjustVisibility(user);
+        Bukkit.getPluginManager().callEvent(new LobbyJoinEvent(user));
     }
 
 
