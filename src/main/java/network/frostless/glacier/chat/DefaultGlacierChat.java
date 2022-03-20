@@ -5,6 +5,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import network.frostless.glacier.user.Users;
 import network.frostless.glacierapi.user.GameUser;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,8 +33,14 @@ public class DefaultGlacierChat extends AbstractChat {
         final GameUser sourceUser = Users.getUser(source.getUniqueId(), GameUser.class);
 
         viewers.removeIf(viewer -> {
-            final GameUser user = Users.getUser(((Player) viewer).getUniqueId(), GameUser.class);
-            return !user.getGameIdentifier().equals(sourceUser.getGameIdentifier());
+            if(viewer instanceof Player) {
+                final GameUser user = Users.getUser(((Player) viewer).getUniqueId(), GameUser.class);
+                return !user.getGameIdentifier().equals(sourceUser.getGameIdentifier());
+            } else if(viewer instanceof ConsoleCommandSender) {
+                return false;
+            } else {
+                return true;
+            }
         });
 
         return viewers;

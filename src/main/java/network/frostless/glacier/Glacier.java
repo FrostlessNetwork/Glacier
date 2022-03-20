@@ -11,6 +11,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import network.frostless.bukkitapi.FrostbiteAPI;
 import network.frostless.glacier.app.GlacierCoreGameLoader;
+import network.frostless.glacier.chat.AbstractChat;
 import network.frostless.glacier.chat.DefaultGlacierChat;
 import network.frostless.glacier.game.GameManagerImpl;
 import network.frostless.glacier.lobby.Lobby;
@@ -66,6 +67,8 @@ public class Glacier<T extends GameUser> {
 
     private Scoreboards scoreboardManager;
 
+    private AbstractChat chatHandler;
+
     private Lobby lobby;
 
 
@@ -86,7 +89,10 @@ public class Glacier<T extends GameUser> {
         worldManager = new WorldManager(slimePlugin);
         gameManager = new GameManagerImpl();
         scoreboardManager = new Scoreboards();
-        frostbite.getChatManager().setChatRenderer(new DefaultGlacierChat());
+        chatHandler = new DefaultGlacierChat();
+
+        frostbite.getChatManager().setChatRenderer(chatHandler);
+        frostbite.getChatManager().setAudienceFilter(chatHandler);
 
         // Load secondary
         loadSecondary();
