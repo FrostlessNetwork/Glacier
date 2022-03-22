@@ -64,7 +64,7 @@ public class UserManagerImpl<T extends GameUser> implements UserManager {
         Glacier.getPlugin().registerListeners(new UserLoginListener());
     }
 
-
+//lol
     @Override
     public CompletableFuture<UserLoaderResult> verifyUser(GlobalUser user) {
         CompletableFuture<UserLoaderResult> future = new CompletableFuture<>();
