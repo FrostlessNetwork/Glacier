@@ -65,6 +65,7 @@ public class UserManagerImpl<T extends GameUser> implements UserManager {
     }
 
 //lol
+    //fix ur shit
     @Override
     public CompletableFuture<UserLoaderResult> verifyUser(GlobalUser user) {
         CompletableFuture<UserLoaderResult> future = new CompletableFuture<>();
