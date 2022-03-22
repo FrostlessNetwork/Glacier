@@ -6,9 +6,6 @@ import com.grinderwolf.swm.api.world.SlimeWorld;
 import io.papermc.paper.chat.ChatRenderer;
 import lombok.Getter;
 import lombok.Setter;
-import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextColor;
 import network.frostless.bukkitapi.FrostbiteAPI;
 import network.frostless.glacier.app.GlacierCoreGameLoader;
 import network.frostless.glacier.chat.AbstractChat;
@@ -19,8 +16,8 @@ import network.frostless.glacier.rank.RankManager;
 import network.frostless.glacier.scoreboard.Scoreboards;
 import network.frostless.glacier.slime.WorldManager;
 import network.frostless.glacier.user.UserManagerImpl;
-import network.frostless.glacier.user.Users;
-import network.frostless.glacier.utils.LazyLocation;
+
+import network.frostless.glacier.vote.VoteManager;
 import network.frostless.glacierapi.game.manager.GameManager;
 import network.frostless.glacierapi.slime.SlimeAPI;
 import network.frostless.glacierapi.user.GameUser;
@@ -29,13 +26,10 @@ import network.frostless.glacierapi.user.loader.UserDataLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 
 /**
  * The entry point to the minigames API.
@@ -77,6 +71,9 @@ public class Glacier<T extends GameUser> {
 
     private Lobby lobby;
 
+    @Getter
+    private VoteManager voteManager;
+
 
     private Glacier() {
         instance = this;
@@ -105,6 +102,8 @@ public class Glacier<T extends GameUser> {
         loadSecondary();
 
         logger.info("Glacier API loaded in " + (System.currentTimeMillis() - start) + "ms");
+
+        voteManager = new VoteManager();
     }
 
     private void loadSecondary() {
@@ -139,4 +138,6 @@ public class Glacier<T extends GameUser> {
     public static <V extends GameUser> Glacier<V> get(Class<V> clazz) {
         return (Glacier<V>) get();
     }
+
+
 }

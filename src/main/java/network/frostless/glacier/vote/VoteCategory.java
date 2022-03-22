@@ -2,15 +2,15 @@ package network.frostless.glacier.vote;
 
 import network.frostless.glacierapi.user.GameUser;
 
-import java.util.List;
+import java.util.Set;
 
 public interface VoteCategory<T> {
 
-    String getVoteType();
+    String getVoteCategoryType();
 
-    String getVoteDescription();
+    String getVoteCategoryDescription();
 
-    void onVote(GameUser user);
+    void onVote(VoteCategory<T> category, Set<GameUser> gameUsers);
 
-    List<T> getVotableItems();
+    Set<T> getVoteCategoryElements();
 }

@@ -4,24 +4,30 @@ import com.google.common.collect.Maps;
 import network.frostless.glacierapi.game.data.UserGameState;
 import network.frostless.glacierapi.user.GameUser;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Predicate;
 
-public class VoteManager {
-    ;
-    private final Map<VoteCategory<?>, Set<GameUser>> voteMap = Collections.synchronizedMap(Maps.newLinkedHashMap());
+public class VoteManager implements Voter {
 
-    public void initVote(VoteCategory<?> category, Set<GameUser> gameUsers) {
-        voteMap.put(category, gameUsers);
+    private final Map<VoteCategory<? extends Votable>, Set<GameUser>> voteMap = Maps.newConcurrentMap();
+
+    @Override
+    public void initVote(VoteCategory<? extends Votable> category, Set<GameUser> gameUsers) {
+        voteMap.putIfAbsent(category, gameUsers);
     }
 
+    @Override
     public void removeVote() {
-        voteMap.values().forEach(gameUsers -> {
-            gameUsers.removeIf(gameUser -> gameUser.getUserState().equals(UserGameState.LOBBY));
+        voteMap.values().forEach(gameuser -> {
+            Predicate<? super GameUser> removeAction = (user) -> user.getUserState() == UserGameState.LOBBY;
+            gameuser.removeIf(removeAction);
         });
     }
 
-    public int getHighestVote(VoteCategory<?> category, int requiredAmount) {
-        Set<GameUser> winningResult = voteMap.get(category);
+    @Override
+    public <T extends VoteCategory<? extends Votable>> int getHighestVote(T result, int requiredAmount) {
+        Set<GameUser> winningResult = voteMap.get(result);
         if (winningResult.size() >= requiredAmount) {
             return winningResult.size();
         }
@@ -29,7 +35,7 @@ public class VoteManager {
         return -1;
     }
 
-    public void destroy() {
+    public void destroyVoteMap() {
         if (voteMap.isEmpty()) return;
         voteMap.clear();
     }
