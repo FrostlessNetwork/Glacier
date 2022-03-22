@@ -47,6 +47,11 @@ public class UserManagerImpl<T extends GameUser> implements UserManager {
 
     private final Cache<UUID, String> loadCache = CacheBuilder.newBuilder().maximumSize(100).expireAfterWrite(1, TimeUnit.MINUTES).build();
     private final Map<UUID, Map.Entry<? extends GameUser, String>> userCache = Maps.newConcurrentMap();
+//fpf[[s[]s[s
+    ';s
+            skfs'f
+    f;f;f;
+
 
 
     private final ConnectionSource connectionSource;
