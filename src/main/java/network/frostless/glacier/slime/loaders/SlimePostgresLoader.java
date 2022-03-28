@@ -36,15 +36,15 @@ public class SlimePostgresLoader extends UpdatableLoader {
 
 
     /* Database version handling queries */
-    private static final String CREATE_VERSIONING_TABLE_QUERY = "CREATE TABLE IF NOT EXISTS database_version (id serial PRIMARY KEY, version int8(11));";
-    private static final String INSERT_VERSION_QUERY = "INSERT INTO database_version (id, version) VALUES(1, ?) ON CONFLICT DO UPDATE SET id = ?;";
+    private static final String CREATE_VERSIONING_TABLE_QUERY = "CREATE TABLE IF NOT EXISTS database_version (id serial PRIMARY KEY, version int8);";
+    private static final String INSERT_VERSION_QUERY = "INSERT INTO database_version (id, version) VALUES(1, ?) ON CONFLICT (id) DO UPDATE SET id = ?;";
     private static final String GET_VERSION_QUERY = "SELECT version FROM database_version WHERE id = 1;";
 
     // World handling queries
     private static final String CREATE_WORLDS_TABLE_QUERY = "CREATE TABLE IF NOT EXISTS worlds (id SERIAL NOT NULL PRIMARY KEY, name varchar(255) UNIQUE, world BYTEA, locked BIGINT);";
     private static final String SELECT_WORLD_QUERY = "SELECT world, locked FROM worlds WHERE name = ?;";
-    private static final String UPDATE_WORLD_QUERY = "INSERT INTO worlds (name, world, locked) VALUES (?, ?, 1) ON CONFLICT DO UPDATE SET world = ?;";
-    private static final String UPDATE_LOCK_QUERY = "UPDATE worlds SET locked = 0 WHERE name = ?;";
+    private static final String UPDATE_WORLD_QUERY = "INSERT INTO worlds (name, world, locked) VALUES (?, ?, 1) ON CONFLICT (name) DO UPDATE SET world = ?;";
+    private static final String UPDATE_LOCK_QUERY = "UPDATE worlds SET locked = ? WHERE name = ?;";
     private static final String DELETE_WORLD_QUERY = "DELETE FROM worlds WHERE name = ?;";
     private static final String LIST_WORLDS_QUERY = "SELECT name FROM worlds;";
 
@@ -199,7 +199,7 @@ public class SlimePostgresLoader extends UpdatableLoader {
 
     @Override
     public void deleteWorld(String worldName) throws UnknownWorldException, IOException {
-        ScheduledFuture future = lockedWorlds.remove(worldName);
+        ScheduledFuture<?> future = lockedWorlds.remove(worldName);
 
         if (future != null) {
             future.cancel(false);
@@ -232,16 +232,6 @@ public class SlimePostgresLoader extends UpdatableLoader {
         hikariConfig.setUsername(credentials.getUsername());
         hikariConfig.setPassword(credentials.getPassword());
         hikariConfig.setDriverClassName("org.postgresql.Driver");
-        hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
-        hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
-        hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-        hikariConfig.addDataSourceProperty("useServerPrepStmts", "true");
-        hikariConfig.addDataSourceProperty("useLocalSessionState", "true");
-        hikariConfig.addDataSourceProperty("rewriteBatchedStatements", "true");
-        hikariConfig.addDataSourceProperty("cacheResultSetMetadata", "true");
-        hikariConfig.addDataSourceProperty("cacheServerConfiguration", "true");
-        hikariConfig.addDataSourceProperty("elideSetAutoCommits", "true");
-        hikariConfig.addDataSourceProperty("maintainTimeStats", "false");
 
         return hikariConfig;
     }

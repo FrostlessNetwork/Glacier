@@ -3,7 +3,6 @@ package network.frostless.glacier;
 import com.google.common.base.Preconditions;
 import com.grinderwolf.swm.api.SlimePlugin;
 import com.grinderwolf.swm.api.world.SlimeWorld;
-import io.papermc.paper.chat.ChatRenderer;
 import lombok.Getter;
 import lombok.Setter;
 import network.frostless.bukkitapi.FrostbiteAPI;
@@ -49,7 +48,7 @@ public class Glacier<T extends GameUser> {
     private static final Logger logger = LogManager.getLogger("Glacier");
 
     @Getter
-    private static final GlacierConfig config = new GlacierConfig();
+    private static GlacierConfig config;
 
     private final Executor executorService = Executors.newCachedThreadPool(r -> new Thread(r, "Glacier-Thread"));
 
@@ -114,7 +113,8 @@ public class Glacier<T extends GameUser> {
     }
 
     private void loadConfig() {
-        config.setFilePath(Path.of(plugin.getDataFolder().getAbsolutePath() + "/config.yml"));
+        config = new GlacierConfig();
+        config.setFilePath(Path.of(plugin.getDataFolder().getAbsolutePath() + "/glacier.yml"));
         try {
             config.load();
         } catch (ConfigurateException e) {

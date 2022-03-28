@@ -8,5 +8,7 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 @ConfigSerializable
 public class GlacierConfigModel {
 
-    private DatabaseCredentials worldDatabase;
+    private String test = "test";
+
+    private DatabaseCredentials worldDatabase = new DatabaseCredentials();
 }
