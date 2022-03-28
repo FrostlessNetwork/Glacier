@@ -10,6 +10,7 @@ import network.frostless.bukkitapi.FrostbiteAPI;
 import network.frostless.glacier.app.GlacierCoreGameLoader;
 import network.frostless.glacier.chat.AbstractChat;
 import network.frostless.glacier.chat.DefaultGlacierChat;
+import network.frostless.glacier.config.GlacierConfig;
 import network.frostless.glacier.game.GameManagerImpl;
 import network.frostless.glacier.lobby.Lobby;
 import network.frostless.glacier.rank.RankManager;
@@ -26,7 +27,9 @@ import network.frostless.glacierapi.user.loader.UserDataLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
+import org.spongepowered.configurate.ConfigurateException;
 
+import java.nio.file.Path;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -44,6 +47,9 @@ public class Glacier<T extends GameUser> {
 
     @Getter
     private static final Logger logger = LogManager.getLogger("Glacier");
+
+    @Getter
+    private static final GlacierConfig config = new GlacierConfig();
 
     private final Executor executorService = Executors.newCachedThreadPool(r -> new Thread(r, "Glacier-Thread"));
 
@@ -82,6 +88,7 @@ public class Glacier<T extends GameUser> {
         if (plugin == null)
             throw new RuntimeException("Glacier is not loaded! Please do Glacier.setPlugin(plugin) before loading!");
         initializeDependencies();
+        loadConfig();
 
         setUserDataLoader(plugin);
         setUserManager(new UserManagerImpl<>(frostbite));
@@ -104,6 +111,16 @@ public class Glacier<T extends GameUser> {
         logger.info("Glacier API loaded in " + (System.currentTimeMillis() - start) + "ms");
 
         voteManager = new VoteManager();
+    }
+
+    private void loadConfig() {
+        config.setFilePath(Path.of(plugin.getDataFolder().getAbsolutePath() + "/config.yml"));
+        try {
+            config.load();
+        } catch (ConfigurateException e) {
+            e.printStackTrace();
+            plugin.getServer().shutdown();
+        }
     }
 
     private void loadSecondary() {

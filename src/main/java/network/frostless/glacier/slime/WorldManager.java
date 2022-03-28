@@ -7,6 +7,7 @@ import com.grinderwolf.swm.api.world.properties.SlimeProperties;
 import com.grinderwolf.swm.api.world.properties.SlimePropertyMap;
 import lombok.Getter;
 import network.frostless.glacier.Glacier;
+import network.frostless.glacier.slime.loaders.SlimePostgresLoader;
 import network.frostless.glacierapi.slime.SlimeAPI;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
@@ -25,6 +26,7 @@ public class WorldManager implements SlimeAPI {
 
     public WorldManager(SlimePlugin slime) {
         this.slime = slime;
+        slime.registerLoader("postgres", new SlimePostgresLoader(Glacier.getConfig().get().getWorldDatabase()));
         this.loader = slime.getLoader("file");
     }
 
