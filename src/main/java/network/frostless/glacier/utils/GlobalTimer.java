@@ -1,4 +1,6 @@
 package network.frostless.glacier.utils;
+import network.frostless.glacierapi.task.GlobalTask;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;

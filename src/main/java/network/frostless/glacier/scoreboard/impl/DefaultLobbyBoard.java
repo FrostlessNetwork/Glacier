@@ -12,9 +12,9 @@ public class DefaultLobbyBoard extends GameBoard {
 
     private final GameUser gameUser;
 
-    public DefaultLobbyBoard(Player player) {
-        super(player, LegacyComponentSerializer.legacySection().serialize(Component.text("Glacier Lobby").color(TextColor.color(0x00FF00))));
-        this.gameUser = Users.getUser(player.getUniqueId(), GameUser.class);
+    public DefaultLobbyBoard(GameUser user) {
+        super(user, LegacyComponentSerializer.legacySection().serialize(Component.text("Glacier Lobby").color(TextColor.color(0x00FF00))));
+        this.gameUser = user;
     }
 
     @Override

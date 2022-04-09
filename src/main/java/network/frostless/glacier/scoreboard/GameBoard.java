@@ -1,12 +1,15 @@
 package network.frostless.glacier.scoreboard;
 
+import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import network.frostless.glacier.Glacier;
 import network.frostless.glacier.scoreboard.core.FrostBoard;
-import org.bukkit.entity.Player;
+import network.frostless.glacierapi.game.Game;
+import network.frostless.glacierapi.user.GameUser;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -19,9 +22,16 @@ public abstract class GameBoard extends FrostBoard {
 
     protected MiniMessage mm = MiniMessage.miniMessage();
 
+    @Getter
+    protected final GameUser user;
 
-    public GameBoard(Player player, String objectiveName) {
-        super(player, objectiveName);
+    protected final Game<?, ?> game;
+
+
+    public GameBoard(GameUser gameUser, String objectiveName) {
+        super(gameUser.getPlayer(), objectiveName);
+        this.user = gameUser;
+        this.game = gameUser.getGame();
     }
 
     protected String[] formatPC(String ...text) {

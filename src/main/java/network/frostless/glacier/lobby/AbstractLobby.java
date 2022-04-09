@@ -9,6 +9,7 @@ import network.frostless.glacier.user.Users;
 import network.frostless.glacier.utils.LazyLocation;
 import network.frostless.glacierapi.events.game.LobbyJoinEvent;
 import network.frostless.glacierapi.game.data.UserGameState;
+import network.frostless.glacierapi.lobby.Lobby;
 import network.frostless.glacierapi.user.GameUser;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -21,7 +22,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 

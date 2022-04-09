@@ -2,6 +2,7 @@ package network.frostless.glacier.countdown;
 
 import lombok.Getter;
 import network.frostless.glacier.team.Team;
+import network.frostless.glacierapi.countdown.Countdown;
 import network.frostless.glacierapi.game.Game;
 import network.frostless.glacierapi.user.GameUser;
 

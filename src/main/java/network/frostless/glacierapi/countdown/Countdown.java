@@ -1,4 +1,4 @@
-package network.frostless.glacier.countdown;
+package network.frostless.glacierapi.countdown;
 
 public interface Countdown {
 

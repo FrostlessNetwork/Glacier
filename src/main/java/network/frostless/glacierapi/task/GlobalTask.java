@@ -1,4 +1,4 @@
-package network.frostless.glacier.utils;
+package network.frostless.glacierapi.task;
 
 public interface GlobalTask {
 

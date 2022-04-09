@@ -27,4 +27,5 @@ public interface GameManager {
 
     boolean hasGame(String identifier);
 
+    <U extends GameUser, T extends Team<U>> Game<U, T> getGame(String identifier);
 }

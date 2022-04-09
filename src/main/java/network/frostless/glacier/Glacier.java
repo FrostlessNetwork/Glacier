@@ -11,8 +11,9 @@ import network.frostless.glacier.app.GlacierCoreGameLoader;
 import network.frostless.glacier.chat.AbstractChat;
 import network.frostless.glacier.chat.DefaultGlacierChat;
 import network.frostless.glacier.config.GlacierConfig;
+import network.frostless.glacier.countdown.CountdownManager;
 import network.frostless.glacier.game.GameManagerImpl;
-import network.frostless.glacier.lobby.Lobby;
+import network.frostless.glacierapi.lobby.Lobby;
 import network.frostless.glacier.rank.RankManager;
 import network.frostless.glacier.scoreboard.Scoreboards;
 import network.frostless.glacier.slime.WorldManager;
@@ -69,18 +70,18 @@ public class Glacier<T extends GameUser> {
     private UserDataLoader<?> userDataLoader;
 
     /* Games API */
-    private GameManager gameManager;
-
-    private SlimeAPI worldManager;
-
-    private Scoreboards scoreboardManager;
-
     private AbstractChat chatHandler;
+
+    private GameManager gameManager;
+    private SlimeAPI worldManager;
+    private Scoreboards scoreboardManager;
+    @Getter
+    private VoteManager voteManager;
+    private CountdownManager countdownManager;
+
 
     private Lobby lobby;
 
-    @Getter
-    private VoteManager voteManager;
 
 
     private Glacier() {
@@ -99,6 +100,7 @@ public class Glacier<T extends GameUser> {
 
         // Games API setup
         executorService.execute(RankManager::fetchAllRanks);
+        countdownManager = new CountdownManager();
         worldManager = new WorldManager(slimePlugin);
         gameManager = new GameManagerImpl();
         scoreboardManager = new Scoreboards();

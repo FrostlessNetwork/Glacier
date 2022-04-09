@@ -27,8 +27,4 @@ public abstract class GameUserImpl<G extends Game<? extends GameUser, ? extends 
         super(uuid);
     }
 
-    public G getGame() {
-        return null;
-    }
-
 }
