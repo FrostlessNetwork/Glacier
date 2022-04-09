@@ -2,6 +2,8 @@ package network.frostless.glacier.user.impl;
 
 import lombok.Getter;
 import lombok.Setter;
+import network.frostless.glacier.team.Team;
+import network.frostless.glacierapi.game.Game;
 import network.frostless.glacierapi.game.data.UserGameState;
 import network.frostless.glacierapi.user.GameUser;
 
@@ -9,7 +11,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public abstract class GameUserImpl extends DataGameUserImpl {
+public abstract class GameUserImpl<G extends Game<? extends GameUser, ? extends Team<? extends GameUser>>> extends DataGameUserImpl {
 
     // Transient, no saves
     private transient String gameIdentifier;
@@ -25,4 +27,9 @@ public abstract class GameUserImpl extends DataGameUserImpl {
         super(uuid);
     }
 
+    public G getGame() {
+        return null;
+    }
+
+    public abstract void onStartGame();
 }

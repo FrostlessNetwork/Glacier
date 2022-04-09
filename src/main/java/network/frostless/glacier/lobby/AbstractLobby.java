@@ -1,8 +1,10 @@
 package network.frostless.glacier.lobby;
 
+import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import network.frostless.glacier.Glacier;
+import network.frostless.glacier.items.ImmutableItem;
 import network.frostless.glacier.user.Users;
 import network.frostless.glacier.utils.LazyLocation;
 import network.frostless.glacierapi.events.game.LobbyJoinEvent;
@@ -19,10 +21,14 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 
 public abstract class AbstractLobby implements Listener, Lobby {
@@ -47,6 +53,15 @@ public abstract class AbstractLobby implements Listener, Lobby {
         this.cachedLocation = spawn;
 
         Glacier.getPlugin().registerListeners(this);
+    }
+
+
+    protected abstract Map<Integer, Pair<ImmutableItem, Consumer<PlayerInteractEvent>>> getItems();
+
+    protected void giveItems(Player player) {
+        for (Map.Entry<Integer, Pair<ImmutableItem, Consumer<PlayerInteractEvent>>> itemset : getItems().entrySet()) {
+            player.getInventory().setItem(itemset.getKey(), itemset.getValue().key().itemStack());
+        }
     }
 
     protected abstract void onLobbyJoin(LobbyJoinEvent event);
@@ -82,7 +97,7 @@ public abstract class AbstractLobby implements Listener, Lobby {
 
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
-        if(!isLobbyUser(event.getEntity())) return;
+        if (!isLobbyUser(event.getEntity())) return;
         event.setCancelled(true);
         event.getPlayer().teleport(getRealLocation());
     }
@@ -90,13 +105,28 @@ public abstract class AbstractLobby implements Listener, Lobby {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent evt) {
         if (evt.getPlayer().getGameMode() == GameMode.CREATIVE) return;
-        if (isLobbyUser(evt.getPlayer())) evt.setCancelled(true);
+        if (isLobbyUser(evt.getPlayer())) {
+            if (evt.getItem() != null) {
+                for (Pair<ImmutableItem, Consumer<PlayerInteractEvent>> value : getItems().values()) {
+
+                    if(ImmutableItem.compare(evt.getItem(), value.key())) {
+                        value.value().accept(evt);
+                    }
+                }
+            }
+            evt.setCancelled(true);
+        }
     }
 
     @EventHandler
     public void onPlayerHunger(FoodLevelChangeEvent event) {
         if (event.getEntity() instanceof Player player && isLobbyUser(player))
             event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onPlayerDrop(PlayerDropItemEvent evt) {
+        if (isLobbyUser(evt.getPlayer())) evt.setCancelled(true);
     }
 
     private boolean isLobbyUser(Player player) {

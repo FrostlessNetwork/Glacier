@@ -10,6 +10,12 @@ repositories {
     maven {
         url = uri("https://papermc.io/repo/repository/maven-public/")
     }
+
+    maven {
+        name = "CodeMC"
+        url = uri("https://repo.codemc.org/repository/maven-public/")
+    }
+
     mavenCentral()
 }
 
@@ -33,6 +39,9 @@ dependencies {
 
     // HikariCP
     compileOnly("com.zaxxer:HikariCP:5.0.1")
+
+    // Mc Dependencies
+    compileOnly("de.tr7zw:item-nbt-api-plugin:2.9.2")
 
     compileOnly(fileTree(mapOf("dir" to "extern", "include" to listOf("*.jar"))))
 }
