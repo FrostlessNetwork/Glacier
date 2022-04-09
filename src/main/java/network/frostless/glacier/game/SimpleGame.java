@@ -1,6 +1,8 @@
 package network.frostless.glacier.game;
 
 import lombok.Data;
+import network.frostless.glacier.countdown.GameCountdown;
+import network.frostless.glacier.countdown.impl.GameStartCountdown;
 import network.frostless.glacier.team.Team;
 import network.frostless.glacierapi.game.Game;
 import network.frostless.glacierapi.game.data.GameState;
@@ -26,14 +28,24 @@ public abstract class SimpleGame<U extends GameUser, T extends Team<U>> implemen
     private World world;
 
     private long startTime;
-
     private List<U> players = new ArrayList<>();
-
+    
+    private List<GameCountdown<U, T>> countdowns = new ArrayList<>();
 
     public SimpleGame() {
         gameState = GameState.WAITING;
+
+        init();
     }
 
+
+    protected void init() {
+        addCountdown(new GameStartCountdown<>(60, 1, this));
+    }
+
+    protected void addCountdown(GameCountdown<U, T> countdown) {
+        countdowns.add(countdown);
+    }
 
     /**
      * Called when the game is needed to be started.

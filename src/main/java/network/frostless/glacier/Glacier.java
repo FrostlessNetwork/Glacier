@@ -13,6 +13,7 @@ import network.frostless.glacier.chat.DefaultGlacierChat;
 import network.frostless.glacier.config.GlacierConfig;
 import network.frostless.glacier.countdown.CountdownManager;
 import network.frostless.glacier.game.GameManagerImpl;
+import network.frostless.glacier.map.MapManager;
 import network.frostless.glacierapi.lobby.Lobby;
 import network.frostless.glacier.rank.RankManager;
 import network.frostless.glacier.scoreboard.Scoreboards;
@@ -75,6 +76,8 @@ public class Glacier<T extends GameUser> {
     private GameManager gameManager;
     private SlimeAPI worldManager;
     private Scoreboards scoreboardManager;
+    private MapManager<?> mapManager;
+
     @Getter
     private VoteManager voteManager;
     private CountdownManager countdownManager;
@@ -138,6 +141,8 @@ public class Glacier<T extends GameUser> {
                 e.printStackTrace();
             }
         });
+
+        countdownManager.startCountdowns();
     }
 
     private void initializeDependencies() {

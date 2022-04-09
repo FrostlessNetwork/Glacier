@@ -17,7 +17,7 @@ import org.bukkit.Sound;
  * @param <U> The type of {@link GameUser}
  * @param <T> The type of {@link Team}
  */
-public abstract class GameStartCountdown<U extends GameUser, T extends Team<U>> extends GameCountdown<U, T> {
+public class GameStartCountdown<U extends GameUser, T extends Team<U>> extends GameCountdown<U, T> {
 
     /**
      * Creates a new game countdown.
@@ -44,6 +44,11 @@ public abstract class GameStartCountdown<U extends GameUser, T extends Team<U>> 
     public void onEnoughPlayers() {
         getGame().broadcast("&eStarting game in &c" + getTimer() + "&e seconds.");
         getGame().executePlayers(p -> p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1));
+    }
+
+    @Override
+    public void onCancel() {
+        getGame().executePlayers(p -> p.sendMessage(Glacier.miniMessage.deserialize("<yellow>Game start cancelled."), MessageType.SYSTEM));
     }
 
     @Override
