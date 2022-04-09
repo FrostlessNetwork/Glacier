@@ -75,4 +75,16 @@ public class GameManagerImpl implements GameManager {
     public boolean hasGame(String identifier) {
         return games.containsKey(identifier);
     }
+
+    @Override
+    public String getRandomIdentifier() {
+        String[] objects = games.keySet().toArray(String[]::new);
+
+        return objects[ThreadLocalRandom.current().nextInt(0, objects.length)];
+    }
+    @SuppressWarnings("unchecked")
+    @Override
+    public <U extends GameUser, T extends Team<U>> Game<U, T> getGame(String identifier) {
+        return (Game<U, T>) games.get(identifier);
+    }
 }
