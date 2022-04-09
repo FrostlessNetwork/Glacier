@@ -35,4 +35,6 @@ public interface GameUser extends DataGameUser {
     default boolean isInLobby() {
         return getUserState() == UserGameState.LOBBY;
     }
+
+    void onStartGame();
 }

@@ -31,5 +31,4 @@ public abstract class GameUserImpl<G extends Game<? extends GameUser, ? extends 
         return null;
     }
 
-    public abstract void onStartGame();
 }
