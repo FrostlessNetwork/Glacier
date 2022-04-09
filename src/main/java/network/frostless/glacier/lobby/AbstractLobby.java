@@ -111,6 +111,7 @@ public abstract class AbstractLobby implements Listener, Lobby {
 
                     if(ImmutableItem.compare(evt.getItem(), value.key())) {
                         value.value().accept(evt);
+                        break;
                     }
                 }
             }

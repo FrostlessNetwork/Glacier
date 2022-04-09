@@ -32,7 +32,7 @@ public class ImmutableItem {
         NBTItem nbtItem = new NBTItem(i1);
         String string = nbtItem.getString(i2.getSignature());
 
-        return string != null;
+        return string != null && string.equals("monkey");
     }
 
     public static boolean compare(ImmutableItem i1, ImmutableItem i2) {
