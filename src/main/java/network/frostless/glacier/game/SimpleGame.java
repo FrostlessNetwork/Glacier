@@ -9,6 +9,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.World;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 public abstract class SimpleGame<U extends GameUser, T extends Team<U>> implements Game<U, T> {
 
@@ -23,6 +26,8 @@ public abstract class SimpleGame<U extends GameUser, T extends Team<U>> implemen
     private World world;
 
     private long startTime;
+
+    private List<U> players = new ArrayList<>();
 
 
     public SimpleGame() {

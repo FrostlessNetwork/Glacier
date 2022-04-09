@@ -5,6 +5,7 @@ import com.grinderwolf.swm.api.SlimePlugin;
 import com.grinderwolf.swm.api.world.SlimeWorld;
 import lombok.Getter;
 import lombok.Setter;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import network.frostless.bukkitapi.FrostbiteAPI;
 import network.frostless.glacier.app.GlacierCoreGameLoader;
 import network.frostless.glacier.chat.AbstractChat;
@@ -41,6 +42,8 @@ import java.util.concurrent.Executors;
 @Getter
 @Setter
 public class Glacier<T extends GameUser> {
+
+    public static MiniMessage miniMessage = MiniMessage.miniMessage();
 
     private static Glacier<?> instance;
 
