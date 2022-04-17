@@ -6,6 +6,7 @@ import network.frostless.glacier.countdown.impl.GameStartCountdown;
 import network.frostless.glacier.team.Team;
 import network.frostless.glacierapi.game.Game;
 import network.frostless.glacierapi.game.data.GameState;
+import network.frostless.glacierapi.map.MapMeta;
 import network.frostless.glacierapi.user.GameUser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -46,12 +47,5 @@ public abstract class SimpleGame<U extends GameUser, T extends Team<U>> implemen
     protected void addCountdown(GameCountdown<U, T> countdown) {
         countdowns.add(countdown);
     }
-
-    /**
-     * Called when the game is needed to be started.
-     */
-    public abstract void start();
-
-    public abstract void stop();
 
 }

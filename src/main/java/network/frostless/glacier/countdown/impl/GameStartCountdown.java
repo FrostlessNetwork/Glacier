@@ -37,6 +37,7 @@ public class GameStartCountdown<U extends GameUser, T extends Team<U>> extends G
             u.onStartGame();
         });
         getGame().setGameState(GameState.INGAME);
+        getGame().start();
     }
 
 

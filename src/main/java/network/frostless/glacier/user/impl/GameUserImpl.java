@@ -21,10 +21,15 @@ public abstract class GameUserImpl<G extends Game<? extends GameUser, ? extends 
     private transient String rank;
 
 
-    public GameUserImpl() {}
+    public GameUserImpl() {
+    }
 
     public GameUserImpl(UUID uuid) {
         super(uuid);
     }
 
+    @SuppressWarnings("unchecked")
+    public G getGame() {
+        return (G) super.getGame();
+    }
 }

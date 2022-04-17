@@ -22,6 +22,14 @@ public interface Game<U extends GameUser, T extends Team<U>> extends Minigame {
     List<U> getPlayers();
 
     /**
+     * Called when the game is needed to be started.
+     */
+    void start();
+
+    void stop();
+
+
+    /**
      * Calls the given consumer for each Bukkit {@link Player} in the game.
      * @param callback The consumer to call for each user.
      */
