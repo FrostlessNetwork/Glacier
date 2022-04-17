@@ -10,4 +10,9 @@ public interface MapMeta {
 
     long getLastModified();
     void setLastModified(long lastModified);
+
+    @SuppressWarnings("unchecked")
+    default <T extends MapMeta> T copy() {
+        return (T) this;
+    }
 }

@@ -2,7 +2,9 @@ package network.frostless.glacier.map;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import network.frostless.frostcore.utils.ObjectUtil;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import network.frostless.glacier.Glacier;
 import network.frostless.glacierapi.map.MapMeta;
 
@@ -15,6 +17,10 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public abstract class MapManager<T extends MapMeta> {
+
+    protected final Gson gson = new GsonBuilder()
+            .create();
+
     private final Cache<String, MapMeta> mapsCache;
 
 
@@ -31,12 +37,9 @@ public abstract class MapManager<T extends MapMeta> {
 
                 ResultSet resultSet = ps.executeQuery();
                 while (resultSet.next()) {
-                    T map = ObjectUtil.createObject(getClazz());
-                    map.setName(resultSet.getString("name"));
-                    map.setLastModified(resultSet.getTimestamp("last_modified").getTime());
-                    map.setVersion(resultSet.getInt("version"));
+                    T data = deserializeMapMeta(gson.toJsonTree(resultSet.getString("data")));
 
-                    maps.put(map.getName(), deserializeMapMeta(map, resultSet.getString("data")));
+                    maps.put(data.getName(), data);
                 }
             }
         } catch (SQLException e) {
@@ -46,7 +49,7 @@ public abstract class MapManager<T extends MapMeta> {
         mapsCache.putAll(maps);
     }
 
-    protected abstract T deserializeMapMeta(T mapMeta, String serializedData);
+    protected abstract T deserializeMapMeta(JsonElement parentObject);
 
     protected abstract Class<T> getClazz();
 }
