@@ -68,7 +68,7 @@ public class UserManagerImpl<T extends GameUser> implements UserManager {
 
         if (debug) {
             logger.info("Verifying user {}", user.getUuid());
-            if (user.getUuid() == UUID.fromString("cd19760f-8345-319b-80bb-acce521dc780")) {
+            if (user.getUuid().equals(UUID.fromString("cd19760f-8345-319b-80bb-acce521dc780"))) {
                 loadCache.put(user.getUuid(), Glacier.get().getGameManager().getRandomIdentifier());
                 return CompletableFuture.completedFuture(UserLoaderResult.ALLOWED);
             }
@@ -145,6 +145,7 @@ public class UserManagerImpl<T extends GameUser> implements UserManager {
         }
 
         loadCache.invalidate(player.getUniqueId());
+        user.getGame().addPlayer(user);
         userCache.put(player.getUniqueId(), Maps.immutableEntry(user, gameIdentifier));
     }
 
@@ -163,6 +164,7 @@ public class UserManagerImpl<T extends GameUser> implements UserManager {
             e.printStackTrace();
         }
 
+        user.getKey().getGame().removePlayer(user.getKey());
         loadCache.invalidate(player.getUniqueId());
         userCache.remove(player.getUniqueId());
     }

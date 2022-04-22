@@ -3,6 +3,8 @@ package network.frostless.glacierapi.slime;
 import com.grinderwolf.swm.api.world.SlimeWorld;
 import org.jetbrains.annotations.NotNull;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
@@ -36,5 +38,8 @@ public interface SlimeAPI {
 
 
     ExecutorService getExecutor();
+
+
+    Connection getConnection() throws SQLException;
 
 }

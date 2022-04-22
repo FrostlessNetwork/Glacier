@@ -12,6 +12,8 @@ import network.frostless.glacierapi.slime.SlimeAPI;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -22,12 +24,13 @@ public class WorldManager implements SlimeAPI {
     private final ExecutorService executor = Executors.newCachedThreadPool(r -> new Thread(r, "Glacier World Manager"));
 
     private final SlimePlugin slime;
-    private final SlimeLoader loader;
+
+    private final SlimePostgresLoader loader;
 
     public WorldManager(SlimePlugin slime) {
         this.slime = slime;
-        slime.registerLoader("postgres", new SlimePostgresLoader(Glacier.getConfig().get().getWorldDatabase()));
-        this.loader = slime.getLoader("file");
+        this.loader = new SlimePostgresLoader(Glacier.getConfig().get().getWorldDatabase());
+        slime.registerLoader("postgres", loader);
     }
 
 
@@ -66,6 +69,11 @@ public class WorldManager implements SlimeAPI {
         generateMap(clone).whenComplete((cloned, err) -> future.complete(cloned));
 
         return future;
+    }
+
+    @Override
+    public Connection getConnection() throws SQLException {
+        return loader.getConnection();
     }
 
 

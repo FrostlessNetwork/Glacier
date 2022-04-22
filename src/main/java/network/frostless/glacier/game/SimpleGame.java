@@ -1,6 +1,7 @@
 package network.frostless.glacier.game;
 
 import lombok.Data;
+import network.frostless.glacier.Glacier;
 import network.frostless.glacier.countdown.GameCountdown;
 import network.frostless.glacier.countdown.impl.GameStartCountdown;
 import network.frostless.glacier.team.Team;
@@ -27,16 +28,19 @@ public abstract class SimpleGame<U extends GameUser, T extends Team<U>> implemen
     private String identifier;
 
     private World world;
+    private MapMeta mapMeta;
 
     private long startTime;
     private List<U> players = new ArrayList<>();
-    
+
     private List<GameCountdown<U, T>> countdowns = new ArrayList<>();
 
     public SimpleGame() {
         gameState = GameState.WAITING;
 
         init();
+
+        Glacier.get().getCountdownManager().addCountdown(countdowns.toArray(GameCountdown[]::new));
     }
 
 
@@ -48,4 +52,22 @@ public abstract class SimpleGame<U extends GameUser, T extends Team<U>> implemen
         countdowns.add(countdown);
     }
 
+
+    public abstract void applyMapMapper(MapMeta mapMeta);
+
+    @Override
+    public void addPlayer(U user) {
+        players.add(user);
+    }
+
+    @Override
+    public void removePlayer(U user) {
+        players.remove(user);
+    }
+
+
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+        logger = LogManager.getLogger("Game " + identifier); // fix logger displaying null...
+    }
 }

@@ -228,12 +228,16 @@ public class SlimePostgresLoader extends UpdatableLoader {
     private HikariConfig generateHikariConfig(DatabaseCredentials credentials) {
         HikariConfig hikariConfig = new HikariConfig();
 
+        hikariConfig.setDriverClassName("org.postgresql.Driver");
         hikariConfig.setJdbcUrl(credentials.getUrl());
         hikariConfig.setUsername(credentials.getUsername());
         hikariConfig.setPassword(credentials.getPassword());
-        hikariConfig.setDriverClassName("org.postgresql.Driver");
 
         return hikariConfig;
+    }
+
+    public Connection getConnection() throws SQLException {
+        return dataSource.getConnection();
     }
 
     private void updateLock(String worldName, boolean forceSchedule) {
