@@ -29,6 +29,7 @@ import network.frostless.glacierapi.user.loader.UserDataLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitScheduler;
 import org.spongepowered.configurate.ConfigurateException;
 
 import java.nio.file.Path;
@@ -84,7 +85,6 @@ public class Glacier<T extends GameUser> {
 
 
     private Lobby lobby;
-
 
 
     private Glacier() {
@@ -167,4 +167,13 @@ public class Glacier<T extends GameUser> {
     }
 
 
+    public void setChatHandler(AbstractChat chatHandler) {
+        this.chatHandler = chatHandler;
+        frostbite.getChatManager().setChatRenderer(chatHandler);
+        frostbite.getChatManager().setAudienceFilter(chatHandler);
+    }
+
+    public static BukkitScheduler scheduler() {
+        return getPlugin().getServer().getScheduler();
+    }
 }

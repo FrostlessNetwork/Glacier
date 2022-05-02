@@ -68,7 +68,7 @@ public class UserManagerImpl<T extends GameUser> implements UserManager {
 
         if (debug) {
             logger.info("Verifying user {}", user.getUuid());
-            if (user.getUuid().equals(UUID.fromString("cd19760f-8345-319b-80bb-acce521dc780"))) {
+            if (user.getUuid().equals(UUID.fromString("cd19760f-8345-319b-80bb-acce521dc780")) || user.getUuid().equals(UUID.fromString("4fd22264-21dd-380d-ab71-fd66aea70f6e"))) {
                 loadCache.put(user.getUuid(), Glacier.get().getGameManager().getRandomIdentifier());
                 return CompletableFuture.completedFuture(UserLoaderResult.ALLOWED);
             }
@@ -124,7 +124,7 @@ public class UserManagerImpl<T extends GameUser> implements UserManager {
             Map<String, Boolean> groupPermissions = Maps.newHashMap();
 
             // mmm good sql query to get permissions : ) - RiceCX
-            try (PreparedStatement statement = connection.prepareStatement("SELECT v.* FROM luckperms_group_permissions AS v JOIN (SELECT LTRIM(t.permission, 'group.') FROM (SELECT permission from luckperms_user_permissions WHERE uuid=? AND permission LIKE 'group.%') t) AS tc ON v.name=tc.ltrim")) {
+            try (PreparedStatement statement = connection.prepareStatement("SELECT v.* FROM luckperms_group_permissions AS v JOIN(SELECT regexp_replace(t.permission, 'group.', '') FROM (SELECT permission from luckperms_user_permissions WHERE uuid=? AND permission LIKE 'group.%') t FETCH FIRST ROW ONLY) AS tc ON v.name=tc.regexp_replace")) {
                 statement.setString(1, user.getUuid().toString());
 
                 ResultSet resultSet = statement.executeQuery();

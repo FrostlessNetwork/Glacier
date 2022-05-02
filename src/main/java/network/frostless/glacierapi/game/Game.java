@@ -2,22 +2,21 @@ package network.frostless.glacierapi.game;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import network.frostless.glacierapi.mechanics.GameMechanicHandler;
 import network.frostless.glacier.team.Team;
 import network.frostless.glacierapi.game.data.GameState;
 import network.frostless.glacierapi.map.MapMeta;
 import network.frostless.glacierapi.user.GameUser;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.function.Consumer;
 
 public interface Game<U extends GameUser, T extends Team<U>> extends Minigame {
 
-
     void setMapMeta(MapMeta map);
-
     MapMeta getMapMeta();
 
     void setWorld(World world);
@@ -29,6 +28,7 @@ public interface Game<U extends GameUser, T extends Team<U>> extends Minigame {
     }
 
 
+    GameMechanicHandler<U> getMechanicHandler();
 
     /* Game state */
     GameState getGameState();
@@ -41,6 +41,10 @@ public interface Game<U extends GameUser, T extends Team<U>> extends Minigame {
 
     List<U> getPlayers();
 
+    int getIngamePlayers();
+
+    int getSpectatingPlayers();
+
     /**
      * Called when the game is needed to be started.
      */
@@ -50,6 +54,8 @@ public interface Game<U extends GameUser, T extends Team<U>> extends Minigame {
 
 
     void applyMapMapper(MapMeta mapMeta);
+
+    Location getWorldCenter();
 
     /**
      * Calls the given consumer for each Bukkit {@link Player} in the game.

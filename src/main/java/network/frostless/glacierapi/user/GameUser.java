@@ -18,15 +18,19 @@ public interface GameUser extends DataGameUser {
     MiniMessage minimessage = MiniMessage.miniMessage();
 
     String getGameIdentifier();
+
     void setGameIdentifier(String identifier);
 
     GlobalUser getGlobalUser();
+
     void setGlobalUser(GlobalUser globalUser);
 
     UserGameState getUserState();
+
     void setUserState(UserGameState state);
 
     String getRank();
+
     void setRank(String rank);
 
     default Component getRankDisplay() {
@@ -36,12 +40,19 @@ public interface GameUser extends DataGameUser {
     default Location getLocation() {
         return getPlayer().getLocation();
     }
+
+    default void sendMessage(Component component) {
+        getPlayer().sendMessage(component);
+    }
+
     default void sendMessage(String message) {
         getPlayer().sendMessage(Glacier.miniMessage.deserialize(message));
     }
+
     default void sendMessage(String message, MessageType type) {
         getPlayer().sendMessage(Glacier.miniMessage.deserialize(message), type);
     }
+
     default <U extends GameUser, T extends Team<U>> Game<U, T> getGame() {
         return Glacier.get().getGameManager().getGame(getGameIdentifier());
     }
@@ -52,6 +63,11 @@ public interface GameUser extends DataGameUser {
 
     default boolean isInLobby() {
         return getUserState() == UserGameState.LOBBY;
+    }
+
+
+    default Component getDisplayName() {
+        return getRankDisplay().append(Component.text(getPlayer().getName()));
     }
 
     void onStartGame();

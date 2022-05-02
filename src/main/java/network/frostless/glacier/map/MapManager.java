@@ -31,7 +31,7 @@ public abstract class MapManager<T extends MapMeta> {
     private final String gameType;
 
     public MapManager(String gameType) {
-        mapsCache = CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.MINUTES).removalListener(new MapUpdater(this)).maximumSize(1000).build();
+        mapsCache = CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.MINUTES).removalListener(new MapUpdater<>(this)).maximumSize(1000).build();
         this.gameType = gameType;
         OffloadTask.offloadAsync(this::loadAndCacheMapsAsync);
 
@@ -69,5 +69,4 @@ public abstract class MapManager<T extends MapMeta> {
 
     protected abstract T deserializeMapMeta(JsonElement parentObject);
 
-    protected abstract Class<T> getClazz();
 }
