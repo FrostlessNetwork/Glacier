@@ -15,9 +15,11 @@ public class DefaultGameMechanicHandler<U extends GameUser> implements GameMecha
     @Override
     public void onDeath(GameUser user) {
         final Player player = user.getPlayer();
+        spectate(user);
         user.getPlayer().spigot().respawn();
         player.teleport(user.getGame().getWorldCenter());
-        spectate(user);
+
+
         user.getGame().executeUsers((u) -> {
             TagResolver tags = TagResolver.builder()
                     .tag("player", Tag.inserting(u.getDisplayName()))
@@ -30,7 +32,6 @@ public class DefaultGameMechanicHandler<U extends GameUser> implements GameMecha
 
     @Override
     public void respawn(GameUser user) {
-        user.getPlayer().spigot().respawn();
         user.getPlayer().setGameMode(org.bukkit.GameMode.SURVIVAL);
         user.getPlayer().teleport(user.getGame().getWorldCenter());
     }

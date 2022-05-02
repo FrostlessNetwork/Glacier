@@ -19,6 +19,7 @@ public class DeathMechanic<U extends GameUser> extends Mechanic<U> {
     public void killOnVoid(EntityDamageEvent event) {
         if (event.getEntity() instanceof Player player && event.getCause() == EntityDamageEvent.DamageCause.VOID) {
             player.setHealth(0.0D);
+            event.setCancelled(true);
         }
     }
 
