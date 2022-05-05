@@ -1,12 +1,19 @@
 plugins {
     java
     id("io.freefair.lombok") version "6.3.0"
+    id("io.github.patrick.remapper") version "1.2.0"
 }
 
 group = "network.frostless"
 version = "0.0.1"
 
 repositories {
+    maven {
+        name = "FrostlessRepo"
+        url = uri("https://repo.ricecx.cc/frostless")
+        credentials(PasswordCredentials::class)
+    }
+
     maven {
         url = uri("https://papermc.io/repo/repository/maven-public/")
     }
@@ -17,6 +24,7 @@ repositories {
     }
 
     mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
@@ -43,5 +51,18 @@ dependencies {
     // Mc Dependencies
     compileOnly("de.tr7zw:item-nbt-api-plugin:2.9.2")
 
+    // Blitz Jar (just for nms mappings)
+    compileOnly("org.spigotmc:spigot:1.18.2-R0.1-SNAPSHOT:remapped-mojang")
+
     compileOnly(fileTree(mapOf("dir" to "extern", "include" to listOf("*.jar"))))
 }
+
+//tasks {
+//    remap {
+//        version.set("1.18.2")
+//    //    archiveClassifier.set("remapped")
+//    }
+//    jar {
+//        dependsOn("remap")
+//    }
+//}

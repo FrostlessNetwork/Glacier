@@ -14,6 +14,7 @@ import network.frostless.glacier.config.GlacierConfig;
 import network.frostless.glacier.countdown.CountdownManager;
 import network.frostless.glacier.game.GameManagerImpl;
 import network.frostless.glacier.map.MapManager;
+import network.frostless.glacierapi.game.GameType;
 import network.frostless.glacierapi.lobby.Lobby;
 import network.frostless.glacier.rank.RankManager;
 import network.frostless.glacier.scoreboard.Scoreboards;
@@ -67,6 +68,10 @@ public class Glacier<T extends GameUser> {
     @Setter
     @Getter
     private static GlacierCoreGameLoader<?> plugin;
+
+    @Setter
+    @Getter
+    private static GameType gameType;
 
     private UserManager userManager;
     private UserDataLoader<?> userDataLoader;

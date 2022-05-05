@@ -1,5 +1,7 @@
 package network.frostless.glacier.loottable;
 
+import com.google.gson.JsonSerializer;
+import net.minecraft.util.FastColor;
 import network.frostless.glacier.Glacier;
 import network.frostless.glacier.utils.RandomCollection;
 import org.bukkit.NamespacedKey;
@@ -21,6 +23,9 @@ public abstract class LootTable<I> implements org.bukkit.loot.LootTable {
 
     @Override
     public @NotNull NamespacedKey getKey() {
+        int multiply = FastColor.ARGB32.multiply(4, 6);
+
+        System.out.println(multiply);
         return Objects.requireNonNull(NamespacedKey.fromString(getClass().getSimpleName().toLowerCase(), Glacier.getPlugin()));
     }
 }
