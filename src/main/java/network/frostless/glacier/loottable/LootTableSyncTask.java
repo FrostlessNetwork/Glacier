@@ -61,7 +61,6 @@ public class LootTableSyncTask implements Runnable {
                 while (rs.next()) {
                     var key = NamespacedKey.fromString(rs.getString("name"));
                     if (key != null) {
-                        System.out.println("Found loot table: " + key);
                         cltBuilder.add(key, lootManager.getGson().fromJson(rs.getString("data"), JsonElement.class));
                     }
                 }
