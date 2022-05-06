@@ -8,6 +8,8 @@ import lombok.Setter;
 public class SimpleMapMeta implements MapMeta {
 
     private String name;
+    private String friendlyName = name;
+
     private long lastModified;
     private int version;
 
