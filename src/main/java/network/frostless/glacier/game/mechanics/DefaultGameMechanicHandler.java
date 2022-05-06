@@ -22,7 +22,7 @@ public class DefaultGameMechanicHandler<U extends GameUser> implements GameMecha
 
         user.getGame().executeUsers((u) -> {
             TagResolver tags = TagResolver.builder()
-                    .tag("player", Tag.inserting(u.getDisplayName()))
+                    .tag("player", Tag.inserting(user.getDisplayName()))
                     .tag("remaining", Tag.inserting(Component.text(user.getGame().getIngamePlayers())))
                     .build();
 

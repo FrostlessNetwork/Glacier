@@ -55,11 +55,11 @@ public class GameStartCountdown<U extends GameUser, T extends Team<U>> extends G
                     throwable1.printStackTrace();
                     return;
                 }
-                MapMeta meta = Glacier.get().getMapManager().getMap("sw-medieval-vm");
-                getGame().setMapMeta(meta);
-                getGame().setWorld(Bukkit.getWorld(template.getName()));
-
                 OffloadTask.offloadSync(() -> {
+                    MapMeta meta = Glacier.get().getMapManager().getMap("sw-medieval-vm");
+                    getGame().setMapMeta(meta);
+                    getGame().setWorld(Bukkit.getWorld(template.getName()));
+
                     getGame().applyMapMapper(meta);
                     getGame().executeUsers(u -> {
                         u.sendMessage("<yellow>Game is now starting!");
