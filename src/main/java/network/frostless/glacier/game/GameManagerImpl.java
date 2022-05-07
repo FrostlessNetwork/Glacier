@@ -43,6 +43,7 @@ public class GameManagerImpl implements GameManager {
 
         game.setIdentifier(identifier);
 
+        Glacier.get().getGameBoard().createBoardAnon(game);
 
         Glacier.getLogger().info("Created game: " + identifier);
 
@@ -60,7 +61,7 @@ public class GameManagerImpl implements GameManager {
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             GameUser user = Users.getUser(onlinePlayer.getUniqueId(), GameUser.class);
 
-            if(user.getGameIdentifier().equals(origin.getGameIdentifier())) {
+            if (user.getGameIdentifier().equals(origin.getGameIdentifier())) {
                 onlinePlayer.showPlayer(Glacier.getPlugin(), origin.getPlayer());
                 origin.getPlayer().showPlayer(Glacier.getPlugin(), onlinePlayer);
             } else {
@@ -82,6 +83,7 @@ public class GameManagerImpl implements GameManager {
 
         return objects[ThreadLocalRandom.current().nextInt(0, objects.length)];
     }
+
     @SuppressWarnings("unchecked")
     @Override
     public <U extends GameUser, T extends Team<U>> Game<U, T> getGame(String identifier) {

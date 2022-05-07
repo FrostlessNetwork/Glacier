@@ -2,6 +2,7 @@ package network.frostless.glacier.map;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -18,7 +19,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public abstract class MapManager<T extends MapMeta> {
 
@@ -26,18 +30,18 @@ public abstract class MapManager<T extends MapMeta> {
             .registerTypeAdapter(Location.class, new LocationAdapter())
             .create();
 
-    private final Cache<String, MapMeta> mapsCache;
+    private final Map<String, MapMeta> mapsCache = Maps.newConcurrentMap();
+    private final ReentrantReadWriteLock mapsCacheLock = new ReentrantReadWriteLock();
+    private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     private final String gameType;
 
     public MapManager(String gameType) {
-        mapsCache = CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.MINUTES).removalListener(new MapUpdater<>(this)).maximumSize(1000).build();
         this.gameType = gameType;
-        OffloadTask.offloadAsync(this::loadAndCacheMapsAsync);
-
+        executor.scheduleAtFixedRate(this::loadAndCacheMapsAsync, 0, 5, TimeUnit.MINUTES);
     }
 
-    public void loadAndCacheMapsAsync() {
+    public synchronized void loadAndCacheMapsAsync() {
         long start = System.currentTimeMillis();
         Glacier.getLogger().info("Loading maps for " + gameType + "...");
         Map<String, T> maps = new HashMap<>();
@@ -57,14 +61,29 @@ public abstract class MapManager<T extends MapMeta> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        mapsCacheLock.writeLock().lock();
+        try {
+            mapsCache.clear();
+            mapsCache.putAll(maps);
+        } finally {
+            mapsCacheLock.writeLock().unlock();
+        }
 
-        mapsCache.putAll(maps);
         Glacier.getLogger().info("Loaded " + maps.size() + " maps for " + gameType + " in " + (System.currentTimeMillis() - start) + "ms");
     }
 
 
-    public MapMeta getMap(String name) {
-        return mapsCache.getIfPresent(name);
+    public synchronized MapMeta getMap(String name) {
+        mapsCacheLock.readLock().lock();
+        try {
+            return mapsCache.get(name);
+        } finally {
+            mapsCacheLock.readLock().unlock();
+        }
+    }
+
+    public void close() {
+        executor.shutdownNow();
     }
 
     protected abstract T deserializeMapMeta(JsonElement parentObject);

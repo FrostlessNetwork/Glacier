@@ -22,6 +22,8 @@ public interface Game<U extends GameUser, T extends Team<U>> extends Minigame {
     void setWorld(World world);
     World getWorld();
 
+    List<T> getTeams();
+
     @SuppressWarnings("unchecked")
     default <V extends MapMeta> V mapMeta() {
         return (V) getMapMeta();

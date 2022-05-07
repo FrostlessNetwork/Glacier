@@ -12,8 +12,11 @@ import network.frostless.glacier.chat.AbstractChat;
 import network.frostless.glacier.chat.DefaultGlacierChat;
 import network.frostless.glacier.config.GlacierConfig;
 import network.frostless.glacier.countdown.CountdownManager;
+import network.frostless.glacier.game.GameBoardManager;
 import network.frostless.glacier.game.GameManagerImpl;
 import network.frostless.glacier.map.MapManager;
+import network.frostless.glacier.team.Team;
+import network.frostless.glacierapi.game.Game;
 import network.frostless.glacierapi.game.GameType;
 import network.frostless.glacierapi.lobby.Lobby;
 import network.frostless.glacier.rank.RankManager;
@@ -23,6 +26,7 @@ import network.frostless.glacier.user.UserManagerImpl;
 
 import network.frostless.glacier.vote.VoteManager;
 import network.frostless.glacierapi.game.manager.GameManager;
+import network.frostless.glacierapi.map.MapMeta;
 import network.frostless.glacierapi.slime.SlimeAPI;
 import network.frostless.glacierapi.user.GameUser;
 import network.frostless.glacierapi.user.UserManager;
@@ -45,11 +49,11 @@ import java.util.concurrent.Executors;
  */
 @Getter
 @Setter
-public class Glacier<T extends GameUser> {
+public class Glacier<T extends GameUser, U extends Team<T>> {
 
     public static MiniMessage miniMessage = MiniMessage.miniMessage();
 
-    private static Glacier<?> instance;
+    private static Glacier<?, ?> instance;
 
     @Getter
     private static final Logger logger = LogManager.getLogger("Glacier");
@@ -67,7 +71,7 @@ public class Glacier<T extends GameUser> {
     /* Internal Loading */
     @Setter
     @Getter
-    private static GlacierCoreGameLoader<?> plugin;
+    private static GlacierCoreGameLoader<?, ?> plugin;
 
     @Setter
     @Getter
@@ -82,11 +86,13 @@ public class Glacier<T extends GameUser> {
     private GameManager gameManager;
     private SlimeAPI worldManager;
     private Scoreboards scoreboardManager;
-    private MapManager<?> mapManager;
+    private MapManager<? extends MapMeta> mapManager;
 
     @Getter
     private VoteManager voteManager;
     private CountdownManager countdownManager;
+
+    private GameBoardManager<T, U> gameBoard = new GameBoardManager<>();
 
 
     private Lobby lobby;
@@ -160,16 +166,23 @@ public class Glacier<T extends GameUser> {
         Preconditions.checkNotNull(slimePlugin, "SlimeWorldManager is not installed! Please install it to use Glacier!");
     }
 
-    public static Glacier<?> get() {
+    @SuppressWarnings("unchecked")
+    public static <U extends GameUser, T extends Team<U>, G extends Game<U, T>> Glacier<U, T> get(Class<G> clazz) {
+        if (instance == null)
+            new Glacier<>();
+        return (Glacier<U, T>) instance;
+    }
+
+    public static Glacier<?, ?> get() {
         if (instance == null) instance = new Glacier<>();
 
         return instance;
     }
 
-    @SuppressWarnings("unchecked")
-    public static <V extends GameUser> Glacier<V> get(Class<V> clazz) {
-        return (Glacier<V>) get();
-    }
+//    @SuppressWarnings("unchecked")
+//    public static <U extends GameUser, V extends Team<U>> Glacier<U, V> get(Class<U> clazz) {
+//        return (Glacier<U, V>) get();
+//    }
 
 
     public void setChatHandler(AbstractChat chatHandler) {

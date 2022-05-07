@@ -2,20 +2,22 @@ package network.frostless.glacier.app;
 
 import network.frostless.bukkitapi.SpigotCoreLoader;
 import network.frostless.glacier.Glacier;
+import network.frostless.glacier.team.Team;
 import network.frostless.glacierapi.user.GameUser;
 import network.frostless.glacierapi.user.loader.UserDataLoader;
 
-public abstract class GlacierCoreGameLoader<User extends GameUser> extends SpigotCoreLoader implements UserDataLoader<User> {
+public abstract class GlacierCoreGameLoader<User extends GameUser, Team extends network.frostless.glacier.team.Team<User>> extends SpigotCoreLoader implements UserDataLoader<User> {
 
 
-    protected Glacier<User> glacierAPI;
+    protected Glacier<User, Team> glacierAPI;
 
+    @SuppressWarnings("unchecked")
     protected void initGlacier() {
         Glacier.setPlugin(this);
 
         refreshConfigurations();
 
-        glacierAPI = Glacier.get(getUserClass());
+        glacierAPI = (Glacier<User, Team>) Glacier.get();
     }
 
 

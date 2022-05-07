@@ -1,7 +1,6 @@
 plugins {
     java
     id("io.freefair.lombok") version "6.3.0"
-    id("io.github.patrick.remapper") version "1.2.0"
 }
 
 group = "network.frostless"

@@ -1,5 +1,6 @@
 package network.frostless.glacier.game;
 
+import com.google.common.base.Objects;
 import lombok.Data;
 import network.frostless.glacier.Glacier;
 import network.frostless.glacier.countdown.GameCountdown;
@@ -22,7 +23,6 @@ import java.util.List;
 
 @Data
 public abstract class SimpleGame<U extends GameUser, T extends Team<U>> implements Game<U, T> {
-
     protected Logger logger = LogManager.getLogger("Game " + getIdentifier());
 
     private GameState gameState;
@@ -37,13 +37,18 @@ public abstract class SimpleGame<U extends GameUser, T extends Team<U>> implemen
     private MapMeta mapMeta;
 
     private long startTime;
+
+    private List<T> teams = new ArrayList<>();
     private List<U> players = new ArrayList<>();
+
+    private int minPlayers;
 
     private List<U> spectators = new ArrayList<>();
 
-    public SimpleGame() {
+    public SimpleGame(int minPlayers, int maxPlayers) {
         gameState = GameState.WAITING;
-
+        this.minPlayers = minPlayers;
+        this.maxPlayers = maxPlayers;
 
         init();
     }
@@ -88,5 +93,21 @@ public abstract class SimpleGame<U extends GameUser, T extends Team<U>> implemen
     public void setIdentifier(String identifier) {
         this.identifier = identifier;
         logger = LogManager.getLogger("Game " + identifier); // fix logger displaying null...
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SimpleGame<?, ?> that)) return false;
+        System.out.println("CALLED EQUALS");
+        System.out.println("ARE WE EQUAL??? " + Objects.equal(getIdentifier(), that.getIdentifier()));
+        return Objects.equal(getIdentifier(), that.getIdentifier());
+    }
+
+    @Override
+    public int hashCode() {
+        System.out.println("CALLED HASHCODE");
+        System.out.println("ARE WE HASHED????? " + Objects.hashCode(getIdentifier()));
+        return Objects.hashCode(getIdentifier());
     }
 }
