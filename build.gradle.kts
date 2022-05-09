@@ -21,6 +21,9 @@ repositories {
         name = "CodeMC"
         url = uri("https://repo.codemc.org/repository/maven-public/")
     }
+    maven { url = uri("https://repo.rapture.pw/repository/maven-releases/") }
+    maven { url = uri("https://repo.rapture.pw/repository/maven-snapshots/") }
+
 
     mavenCentral()
     mavenLocal()
@@ -53,7 +56,8 @@ dependencies {
     // Blitz Jar (just for nms mappings)
     compileOnly("org.spigotmc:spigot:1.18.2-R0.1-SNAPSHOT:remapped-mojang")
 
-    compileOnly(fileTree(mapOf("dir" to "extern", "include" to listOf("*.jar"))))
+    compileOnly("com.grinderwolf:slimeworldmanager-api:2.8.0-SNAPSHOT")
+//    compileOnly(fileTree(mapOf("dir" to "extern", "include" to listOf("*.jar"))))
 }
 
 //tasks {

@@ -52,7 +52,6 @@ public abstract class MapManager<T extends MapMeta> {
 
                 ResultSet resultSet = ps.executeQuery();
                 while (resultSet.next()) {
-                    System.out.println(resultSet.getString("data"));
                     T data = deserializeMapMeta(gson.fromJson(resultSet.getString("data"), JsonObject.class));
 
                     maps.put(data.getName(), data);

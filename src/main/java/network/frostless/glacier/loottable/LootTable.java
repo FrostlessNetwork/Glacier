@@ -8,6 +8,7 @@ import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 
+@Deprecated
 public abstract class LootTable<I> implements org.bukkit.loot.LootTable {
 
     private final RandomCollection<I> entries = new RandomCollection<>();
@@ -25,7 +26,6 @@ public abstract class LootTable<I> implements org.bukkit.loot.LootTable {
     public @NotNull NamespacedKey getKey() {
         int multiply = FastColor.ARGB32.multiply(4, 6);
 
-        System.out.println(multiply);
         return Objects.requireNonNull(NamespacedKey.fromString(getClass().getSimpleName().toLowerCase(), Glacier.getPlugin()));
     }
 }

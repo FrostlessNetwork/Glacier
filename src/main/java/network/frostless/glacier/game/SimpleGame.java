@@ -99,15 +99,12 @@ public abstract class SimpleGame<U extends GameUser, T extends Team<U>> implemen
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof SimpleGame<?, ?> that)) return false;
-        System.out.println("CALLED EQUALS");
-        System.out.println("ARE WE EQUAL??? " + Objects.equal(getIdentifier(), that.getIdentifier()));
+
         return Objects.equal(getIdentifier(), that.getIdentifier());
     }
 
     @Override
     public int hashCode() {
-        System.out.println("CALLED HASHCODE");
-        System.out.println("ARE WE HASHED????? " + Objects.hashCode(getIdentifier()));
         return Objects.hashCode(getIdentifier());
     }
 }
