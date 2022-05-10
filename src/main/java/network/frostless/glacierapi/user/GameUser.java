@@ -2,6 +2,7 @@ package network.frostless.glacierapi.user;
 
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import network.frostless.frostentities.entity.GlobalUser;
 import network.frostless.glacier.Glacier;
@@ -13,6 +14,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+// See F-bounded types https://stackoverflow.com/questions/2413829/java-interfaces-and-return-types
 public interface GameUser extends DataGameUser {
 
     MiniMessage minimessage = MiniMessage.miniMessage();
@@ -32,6 +34,7 @@ public interface GameUser extends DataGameUser {
     String getRank();
 
     void setRank(String rank);
+
 
     default Component getRankDisplay() {
         return minimessage.deserialize(RankManager.getRank(getRank()));
@@ -63,6 +66,19 @@ public interface GameUser extends DataGameUser {
 
     default boolean isInLobby() {
         return getUserState() == UserGameState.LOBBY;
+    }
+
+    default Component getTeamDisplayName() {
+        Team<GameUser> team = getGame().getTeamForPlayer(this);
+        if (team == null) {
+            return name();
+        } else {
+            return team.displayName().append(name().color(team.getTeamColor().getNamedTextColor()));
+        }
+    }
+
+    default Component name() {
+        return Component.text(getPlayer().getName());
     }
 
 

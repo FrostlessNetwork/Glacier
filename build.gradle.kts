@@ -12,6 +12,9 @@ repositories {
         url = uri("https://repo.ricecx.cc/frostless")
         credentials(PasswordCredentials::class)
     }
+    maven {
+        url = uri("https://jitpack.io")
+    }
 
     maven {
         url = uri("https://papermc.io/repo/repository/maven-public/")
@@ -57,6 +60,10 @@ dependencies {
     compileOnly("org.spigotmc:spigot:1.18.2-R0.1-SNAPSHOT:remapped-mojang")
 
     compileOnly("com.grinderwolf:slimeworldmanager-api:2.8.0-SNAPSHOT")
+
+    compileOnly("com.github.Revxrsal.Lamp:common:3.0.4")
+
+    compileOnly("com.github.Revxrsal.Lamp:bukkit:3.0.4")
 //    compileOnly(fileTree(mapOf("dir" to "extern", "include" to listOf("*.jar"))))
 }
 

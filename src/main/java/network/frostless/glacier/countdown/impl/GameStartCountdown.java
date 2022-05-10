@@ -64,7 +64,7 @@ public class GameStartCountdown<U extends GameUser, T extends Team<U>> extends G
                     getGame().executeUsers(u -> {
                         u.sendMessage("<yellow>Game is now starting!");
                         u.setUserState(UserGameState.INGAME);
-                        u.onStartGame();
+                        OffloadTask.offloadSync(u::onStartGame);
                     });
                     getGame().setGameState(GameState.INGAME);
                     getGame().start();

@@ -43,9 +43,8 @@ public class GameManagerImpl implements GameManager {
 
         game.setIdentifier(identifier);
 
-        Glacier.get().getGameBoard().createBoardAnon(game);
-
         Glacier.getLogger().info("Created game: " + identifier);
+        game.onReady();
 
         return CompletableFuture.completedFuture(identifier);
     }

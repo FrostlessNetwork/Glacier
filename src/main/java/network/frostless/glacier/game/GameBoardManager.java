@@ -1,6 +1,5 @@
 package network.frostless.glacier.game;
 
-import com.google.common.collect.Maps;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -37,7 +36,8 @@ public class GameBoardManager<U extends GameUser, T extends Team<U>> {
 
         for (T team : game.getTeams()) {
             org.bukkit.scoreboard.Team team_ = gameBoard.registerNewTeam(String.format("%s-%s", game.getIdentifier(), team.getUuid()));
-            team_.prefix(Component.text(team.getDisplayName()));
+            team_.prefix(team.displayName().append(Component.space()));
+            team_.color(team.getTeamColor().getNamedTextColor());
             team_.setOption(org.bukkit.scoreboard.Team.Option.COLLISION_RULE, org.bukkit.scoreboard.Team.OptionStatus.FOR_OTHER_TEAMS);
             team_.setOption(org.bukkit.scoreboard.Team.Option.NAME_TAG_VISIBILITY, org.bukkit.scoreboard.Team.OptionStatus.ALWAYS);
             team_.setOption(org.bukkit.scoreboard.Team.Option.DEATH_MESSAGE_VISIBILITY, org.bukkit.scoreboard.Team.OptionStatus.NEVER);
@@ -45,11 +45,12 @@ public class GameBoardManager<U extends GameUser, T extends Team<U>> {
         scoreboards.put(game, gameBoard);
     }
 
+
     public org.bukkit.scoreboard.Team getSpectator(Game<U, T> game) {
         return scoreboards.get(game).getTeam(String.format("%s-SPEC_999", game.getIdentifier()));
     }
 
-    public org.bukkit.scoreboard.Team getTeam(Game<U, T> game, T team) {
+    public org.bukkit.scoreboard.Team getTeam(Game<?, ?> game, Team<? extends GameUser> team) {
         return scoreboards.get(game).getTeam(String.format("%s-%s", game.getIdentifier(), team.getUuid()));
     }
 

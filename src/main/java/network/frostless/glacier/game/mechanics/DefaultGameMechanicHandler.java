@@ -30,11 +30,11 @@ public class DefaultGameMechanicHandler<U extends GameUser> implements GameMecha
 
         user.getGame().executeUsers((u) -> {
             TagResolver tags = TagResolver.builder()
-                    .tag("player", Tag.inserting(user.getDisplayName()))
+                    .tag("player", Tag.inserting(user.getTeamDisplayName()))
                     .tag("remaining", Tag.inserting(Component.text(user.getGame().getIngamePlayers())))
                     .build();
 
-            u.sendMessage(mm.deserialize("<red><player> <gray>died! There are <remaining> players left!", tags));
+            u.sendMessage(mm.deserialize("<player> <reset><gray>died! There are <remaining> players left!", tags));
         });
     }
 
@@ -53,7 +53,7 @@ public class DefaultGameMechanicHandler<U extends GameUser> implements GameMecha
         user.getPlayer().setFlying(true);
         user.getPlayer().setCollidable(false);
         user.getPlayer().setInvulnerable(true);
-        user.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, false));
+        user.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, true));
         user.setUserState(UserGameState.SPECTATING);
         Team team = Glacier.get().getGameBoard().getSpectator(user.getGame());
 

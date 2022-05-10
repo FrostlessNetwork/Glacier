@@ -3,8 +3,15 @@ package network.frostless.glacier.team;
 import com.google.common.collect.Lists;
 import lombok.Data;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import network.frostless.glacier.Glacier;
+import network.frostless.glacierapi.events.game.GameUserJoinTeamEvent;
 import network.frostless.glacierapi.user.GameUser;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Scoreboard;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -24,7 +31,8 @@ public abstract class Team<P extends GameUser> {
 
     // Team meta
     private TeamColor teamColor = TeamColor.WHITE;
-    @Nullable private String name;
+    @Nullable
+    private String name;
 
 
     public Team(int size) {
@@ -34,8 +42,10 @@ public abstract class Team<P extends GameUser> {
     }
 
     public void addPlayer(P player) {
-        if(!players.contains(player))
+        if (!players.contains(player))
             players.add(player);
+
+        //    Glacier.callEvent(new GameUserJoinTeamEvent(player, this));
     }
 
     public void removePlayer(P player) {
@@ -56,5 +66,9 @@ public abstract class Team<P extends GameUser> {
 
     public String getDisplayName() {
         return name != null ? teamColor.getChatColor() + name : teamColor.getChatColor() + teamColor.getName();
+    }
+
+    public Component displayName() {
+        return Component.text( teamColor.getName(), teamColor.getNamedTextColor()).decorate(TextDecoration.BOLD);
     }
 }

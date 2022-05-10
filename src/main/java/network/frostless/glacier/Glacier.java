@@ -10,8 +10,12 @@ import network.frostless.bukkitapi.FrostbiteAPI;
 import network.frostless.glacier.app.GlacierCoreGameLoader;
 import network.frostless.glacier.chat.AbstractChat;
 import network.frostless.glacier.chat.DefaultGlacierChat;
+import network.frostless.glacier.commands.GlacierCommands;
+import network.frostless.glacier.commands.core.GameAutoCompleter;
 import network.frostless.glacier.config.GlacierConfig;
 import network.frostless.glacier.countdown.CountdownManager;
+import network.frostless.glacier.exceptions.GameNotFoundException;
+import network.frostless.glacier.exceptions.GlacierExceptionAdapter;
 import network.frostless.glacier.game.GameBoardManager;
 import network.frostless.glacier.game.GameManagerImpl;
 import network.frostless.glacier.map.MapManager;
@@ -34,8 +38,11 @@ import network.frostless.glacierapi.user.loader.UserDataLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandException;
+import org.bukkit.event.Event;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.spongepowered.configurate.ConfigurateException;
+import revxrsal.commands.bukkit.BukkitCommandHandler;
 
 import java.nio.file.Path;
 import java.util.concurrent.ExecutionException;
@@ -72,6 +79,9 @@ public class Glacier<T extends GameUser, U extends Team<T>> {
     @Setter
     @Getter
     private static GlacierCoreGameLoader<?, ?> plugin;
+
+    @Getter
+    private BukkitCommandHandler commandHandler;
 
     @Setter
     @Getter
@@ -131,6 +141,12 @@ public class Glacier<T extends GameUser, U extends Team<T>> {
         voteManager = new VoteManager();
     }
 
+    private void loadCommands() {
+        commandHandler.register(
+                new GlacierCommands()
+        );
+    }
+
     private void loadConfig() {
         config = new GlacierConfig();
         config.setFilePath(Path.of(plugin.getDataFolder().getAbsolutePath() + "/glacier.yml"));
@@ -143,6 +159,7 @@ public class Glacier<T extends GameUser, U extends Team<T>> {
     }
 
     private void loadSecondary() {
+        loadCommands();
         worldManager.loadMap("ptbl-slime").whenComplete((map, err) -> {
             try {
                 SlimeWorld slimeWorld = worldManager.generateMap(map).get();
@@ -164,6 +181,22 @@ public class Glacier<T extends GameUser, U extends Team<T>> {
         /* AdvancedSlimeWorldManager */
         slimePlugin = (SlimePlugin) Bukkit.getPluginManager().getPlugin("SlimeWorldManager");
         Preconditions.checkNotNull(slimePlugin, "SlimeWorldManager is not installed! Please install it to use Glacier!");
+
+        commandHandler = BukkitCommandHandler.create(getPlugin());
+
+        commandHandler.setExceptionHandler(new GlacierExceptionAdapter());
+
+        commandHandler.registerValueResolver(Game.class, ctx -> {
+            String gameName = ctx.pop();
+            Game<?, ?> game = gameManager.getGame(gameName);
+            if (game == null) {
+                throw new GameNotFoundException(gameName);
+            }
+            return game;
+        });
+
+        commandHandler.getAutoCompleter()
+                .registerParameterSuggestions(Game.class, new GameAutoCompleter());
     }
 
     @SuppressWarnings("unchecked")
@@ -193,5 +226,9 @@ public class Glacier<T extends GameUser, U extends Team<T>> {
 
     public static BukkitScheduler scheduler() {
         return getPlugin().getServer().getScheduler();
+    }
+
+    public static void callEvent(Event event) {
+        Bukkit.getPluginManager().callEvent(event);
     }
 }

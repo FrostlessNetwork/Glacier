@@ -1,6 +1,7 @@
 package network.frostless.glacier.game.mechanics.impl;
 
 import network.frostless.glacier.async.OffloadTask;
+import network.frostless.glacier.user.Users;
 import network.frostless.glacierapi.mechanics.GameMechanicHandler;
 import network.frostless.glacierapi.mechanics.Mechanic;
 import network.frostless.glacierapi.user.GameUser;
@@ -25,6 +26,7 @@ public class DeathMechanic<U extends GameUser> extends Mechanic<U> {
 
     @EventHandler
     public void onDeath(PlayerDeathEvent evt) {
+        if (Users.getUser(evt.getPlayer().getUniqueId(), GameUser.class).isInLobby()) return;
         OffloadTask.offloadDelayedSync(() -> mechanicHandler.onDeath(getUser(evt.getPlayer().getUniqueId())), 1);
     }
 }

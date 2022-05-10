@@ -3,10 +3,13 @@ package network.frostless.glacier.game;
 import com.google.common.base.Objects;
 import lombok.Data;
 import network.frostless.glacier.Glacier;
+import network.frostless.glacier.countdown.CountdownManager;
 import network.frostless.glacier.countdown.GameCountdown;
 import network.frostless.glacier.countdown.impl.GameStartCountdown;
+import network.frostless.glacier.game.events.DefaultGameEventManager;
+import network.frostless.glacierapi.game.event.GameEvent;
 import network.frostless.glacier.game.mechanics.DefaultGameMechanicHandler;
-import network.frostless.glacier.game.mechanics.impl.DeathMechanic;
+import network.frostless.glacierapi.game.event.GameEventManager;
 import network.frostless.glacierapi.mechanics.GameMechanicHandler;
 import network.frostless.glacier.team.Team;
 import network.frostless.glacierapi.game.Game;
@@ -18,8 +21,10 @@ import org.apache.logging.log4j.Logger;
 import org.bukkit.Location;
 import org.bukkit.World;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 
 @Data
 public abstract class SimpleGame<U extends GameUser, T extends Team<U>> implements Game<U, T> {
@@ -45,11 +50,15 @@ public abstract class SimpleGame<U extends GameUser, T extends Team<U>> implemen
 
     private List<U> spectators = new ArrayList<>();
 
+    private GameEventManager<Game<U, T>> eventManager = new DefaultGameEventManager<>(this);
+
     public SimpleGame(int minPlayers, int maxPlayers) {
         gameState = GameState.WAITING;
         this.minPlayers = minPlayers;
         this.maxPlayers = maxPlayers;
+    }
 
+    public void onReady() {
         init();
     }
 
@@ -62,8 +71,38 @@ public abstract class SimpleGame<U extends GameUser, T extends Team<U>> implemen
         Glacier.get().getCountdownManager().addCountdown(countdown);
     }
 
+    public void forceStart() {
+        // TODO: fix this later kthx countdown should have a flag to force start not just literally force it to
+        CountdownManager cdm = Glacier.get().getCountdownManager();
+        List<GameCountdown<?, ?>> cds = cdm.getCountdowns(this);
+        if (cds.size() > 0) {
+            GameCountdown<?, ?> gcd = cds.get(0);
+            gcd.start();
+            cdm.stopCountdown(gcd);
+        } else start();
+    }
+
+    @SuppressWarnings("unchecked")
+    public void addGameEvent(GameEvent<? extends Game<U, T>> event) {
+        eventManager.addEvent((GameEvent<Game<U, T>>) event);
+    }
+
+    @SuppressWarnings("unchecked")
+    public void addGameEvent(GameEvent<? extends Game<U, T>>... events) {
+        for (GameEvent<? extends Game<U, T>> event : events) {
+            eventManager.addEvent((GameEvent<Game<U, T>>) event);
+        }
+    }
 
     public abstract void applyMapMapper(MapMeta mapMeta);
+
+    @Override
+    public Team<U> getTeamForPlayer(U player) {
+        for (T team : teams) {
+            if (team.getPlayers().contains(player)) return team;
+        }
+        return null;
+    }
 
     @Override
     public void addPlayer(U user) {
