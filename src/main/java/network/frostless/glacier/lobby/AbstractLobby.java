@@ -134,7 +134,7 @@ public abstract class AbstractLobby implements Listener, Lobby {
         GameUser user = Users.getUser(player.getUniqueId(), GameUser.class);
         if (user == null) return false;
 
-        return user.isInLobby();
+        return user.isInLobby() || user.isSpectator();
     }
 
     private Location getRealLocation() {

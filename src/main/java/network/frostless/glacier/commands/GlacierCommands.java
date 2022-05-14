@@ -37,9 +37,9 @@ public class GlacierCommands {
 
         Component gamesRunning = Component.empty();
 
-        for (Map.Entry<String, Object> entr : gameManager.getGames().entrySet()) {
+        for (Map.Entry<String, Game<?,?>> entr : gameManager.getGames().entrySet()) {
             String gameName = entr.getKey();
-            Object game = entr.getValue();
+            Game<?, ?> game = entr.getValue();
             TagResolver gameTags = TagResolver.builder()
                     .tag("game", Tag.inserting(Component.text(gameName)))
                     .tag("gametype", Tag.inserting(Component.text(game.getClass().getSimpleName())))

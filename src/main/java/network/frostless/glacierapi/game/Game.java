@@ -2,6 +2,7 @@ package network.frostless.glacierapi.game;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import network.frostless.glacier.game.mechanics.GameMechanicManager;
 import network.frostless.glacierapi.game.event.GameEventManager;
 import network.frostless.glacierapi.mechanics.GameMechanicHandler;
 import network.frostless.glacier.team.Team;
@@ -28,6 +29,9 @@ public interface Game<U extends GameUser, T extends Team<U>> extends Minigame {
     World getWorld();
 
     List<T> getTeams();
+
+    boolean canEnd();
+    void endGame();
 
     @SuppressWarnings("unchecked")
     default <V extends MapMeta> V mapMeta() {
@@ -76,6 +80,8 @@ public interface Game<U extends GameUser, T extends Team<U>> extends Minigame {
 
 
     void applyMapMapper(MapMeta mapMeta);
+
+    void addToSpectators(U user);
 
     Location getWorldCenter();
 

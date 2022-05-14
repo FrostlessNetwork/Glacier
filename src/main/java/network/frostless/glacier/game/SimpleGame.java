@@ -3,6 +3,7 @@ package network.frostless.glacier.game;
 import com.google.common.base.Objects;
 import lombok.Data;
 import network.frostless.glacier.Glacier;
+import network.frostless.glacier.async.OffloadTask;
 import network.frostless.glacier.countdown.CountdownManager;
 import network.frostless.glacier.countdown.GameCountdown;
 import network.frostless.glacier.countdown.impl.GameStartCountdown;
@@ -21,10 +22,8 @@ import org.apache.logging.log4j.Logger;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 
 @Data
 public abstract class SimpleGame<U extends GameUser, T extends Team<U>> implements Game<U, T> {
@@ -117,6 +116,21 @@ public abstract class SimpleGame<U extends GameUser, T extends Team<U>> implemen
     @Override
     public int getIngamePlayers() {
         return (int) players.stream().filter(u -> !spectators.contains(u)).count();
+    }
+
+    @Override
+    public void addToSpectators(U user) {
+        org.bukkit.scoreboard.Team team = Glacier.get().getGameBoard().getSpectator(user.getGame());
+
+        if (team != null) {
+            OffloadTask.offloadSync(() -> team.addPlayer(user.getPlayer()));
+        } else logger.error("Spectators team is null!");
+
+        spectators.add(user);
+        executeUsers(u -> {
+            if (u.isSpectator() || u == user) return;
+            u.getPlayer().hidePlayer(Glacier.getPlugin(), user.getPlayer());
+        });
     }
 
     @Override

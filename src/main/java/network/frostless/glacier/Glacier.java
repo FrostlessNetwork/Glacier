@@ -20,6 +20,7 @@ import network.frostless.glacier.game.GameBoardManager;
 import network.frostless.glacier.game.GameManagerImpl;
 import network.frostless.glacier.map.MapManager;
 import network.frostless.glacier.team.Team;
+import network.frostless.glacier.utils.OptimalServerSettings;
 import network.frostless.glacierapi.game.Game;
 import network.frostless.glacierapi.game.GameType;
 import network.frostless.glacierapi.lobby.Lobby;
@@ -38,6 +39,7 @@ import network.frostless.glacierapi.user.loader.UserDataLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
+import org.bukkit.Server;
 import org.bukkit.command.CommandException;
 import org.bukkit.event.Event;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -116,6 +118,7 @@ public class Glacier<T extends GameUser, U extends Team<T>> {
             throw new RuntimeException("Glacier is not loaded! Please do Glacier.setPlugin(plugin) before loading!");
         initializeDependencies();
         loadConfig();
+        OptimalServerSettings.check(false);
 
         setUserDataLoader(plugin);
         setUserManager(new UserManagerImpl<>(frostbite));
@@ -226,6 +229,10 @@ public class Glacier<T extends GameUser, U extends Team<T>> {
 
     public static BukkitScheduler scheduler() {
         return getPlugin().getServer().getScheduler();
+    }
+
+    public static Server server() {
+        return getPlugin().getServer();
     }
 
     public static void callEvent(Event event) {

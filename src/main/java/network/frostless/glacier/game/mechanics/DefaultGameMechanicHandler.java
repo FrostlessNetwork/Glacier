@@ -4,16 +4,11 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import network.frostless.glacier.Glacier;
-import network.frostless.glacier.async.OffloadTask;
 import network.frostless.glacierapi.game.data.UserGameState;
 import network.frostless.glacierapi.mechanics.GameMechanicHandler;
 import network.frostless.glacierapi.user.GameUser;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scoreboard.Team;
 
 public class DefaultGameMechanicHandler<U extends GameUser> implements GameMechanicHandler<U> {
 
@@ -25,8 +20,8 @@ public class DefaultGameMechanicHandler<U extends GameUser> implements GameMecha
         user.getPlayer().spigot().respawn();
         user.getPlayer().setGameMode(GameMode.SPECTATOR);
         player.teleport(user.getGame().getWorldCenter());
+        user.setUserState(UserGameState.SPECTATING);
         spectate(user);
-
 
         user.getGame().executeUsers((u) -> {
             TagResolver tags = TagResolver.builder()
@@ -47,20 +42,21 @@ public class DefaultGameMechanicHandler<U extends GameUser> implements GameMecha
     @Override
     public void spectate(GameUser user) {
         user.getPlayer().getInventory().clear();
+        user.setUserState(UserGameState.SPECTATING);
+        user.getGame().addToSpectators(user);
+
         user.getPlayer().setFallDistance(0.0F);
         user.getPlayer().setGameMode(GameMode.SURVIVAL);
         user.getPlayer().setAllowFlight(true);
         user.getPlayer().setFlying(true);
         user.getPlayer().setCollidable(false);
         user.getPlayer().setInvulnerable(true);
-        user.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, true));
-        user.setUserState(UserGameState.SPECTATING);
-        Team team = Glacier.get().getGameBoard().getSpectator(user.getGame());
+        user.getPlayer().setInvisible(true);
 
-        if (team != null) {
-            OffloadTask.offloadSync(() -> team.addPlayer(user.getPlayer()));
-        } else {
-            System.err.println("Spectators team is null!");
-        }
+        giveSpectatorTools(user);
+    }
+
+    private void giveSpectatorTools(GameUser user) {
+        final Player player = user.getPlayer();
     }
 }

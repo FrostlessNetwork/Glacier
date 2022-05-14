@@ -68,6 +68,10 @@ public interface GameUser extends DataGameUser {
         return getUserState() == UserGameState.LOBBY;
     }
 
+    default boolean isSpectator() {
+        return getUserState() == UserGameState.SPECTATING;
+    }
+
     default Component getTeamDisplayName() {
         Team<GameUser> team = getGame().getTeamForPlayer(this);
         if (team == null) {
@@ -87,4 +91,10 @@ public interface GameUser extends DataGameUser {
     }
 
     void onStartGame();
+
+    <U extends GameUser> boolean areTeamMates(U user);
+
+    Location getSpawnpoint();
+
+    void setSpawnpoint(Location location);
 }

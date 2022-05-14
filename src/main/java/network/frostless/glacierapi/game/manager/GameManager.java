@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 
 public interface GameManager {
 
-    Map<String, Object> getGames();
+    Map<String, Game<?, ?>> getGames();
 
     /**
      * Creates a game and returns the specified game identifier

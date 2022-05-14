@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @Getter
 public class GameManagerImpl implements GameManager {
 
-    private final Map<String, Object> games = Maps.newConcurrentMap();
+    private final Map<String, Game<?, ?>> games = Maps.newConcurrentMap();
     private final Redis<String, String> redis;
 
 
@@ -60,7 +60,7 @@ public class GameManagerImpl implements GameManager {
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             GameUser user = Users.getUser(onlinePlayer.getUniqueId(), GameUser.class);
 
-            if (user.getGameIdentifier().equals(origin.getGameIdentifier())) {
+            if (user.getGameIdentifier().equals(origin.getGameIdentifier()) && !user.isSpectator()) {
                 onlinePlayer.showPlayer(Glacier.getPlugin(), origin.getPlayer());
                 origin.getPlayer().showPlayer(Glacier.getPlugin(), onlinePlayer);
             } else {

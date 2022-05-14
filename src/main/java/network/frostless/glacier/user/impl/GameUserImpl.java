@@ -6,6 +6,7 @@ import network.frostless.glacier.team.Team;
 import network.frostless.glacierapi.game.Game;
 import network.frostless.glacierapi.game.data.UserGameState;
 import network.frostless.glacierapi.user.GameUser;
+import org.bukkit.Location;
 
 import java.util.UUID;
 
@@ -20,6 +21,7 @@ public abstract class GameUserImpl<G extends Game<? extends GameUser, ? extends 
 
     private transient String rank;
 
+    private transient Location spawnpoint;
 
     public GameUserImpl() {
     }
