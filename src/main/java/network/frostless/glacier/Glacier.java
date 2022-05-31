@@ -123,6 +123,7 @@ public class Glacier<T extends GameUser, U extends Team<T>> {
         setUserDataLoader(plugin);
         setUserManager(new UserManagerImpl<>(frostbite));
 
+        getPlugin().registerPreConnections();
         userManager.registerConnection();
 
         // Games API setup
@@ -163,7 +164,10 @@ public class Glacier<T extends GameUser, U extends Team<T>> {
 
     private void loadSecondary() {
         loadCommands();
-        worldManager.loadMap("ptbl-slime").whenComplete((map, err) -> {
+        String lobbyMap = getPlugin().getConfig().getString("lobby.map");
+        if (lobbyMap == null) throw new RuntimeException("Lobby map is not set!");
+
+        worldManager.loadMap(lobbyMap).whenComplete((map, err) -> {
             try {
                 SlimeWorld slimeWorld = worldManager.generateMap(map).get();
                 logger.info("Lobby map '{}' loaded!", slimeWorld.getName());

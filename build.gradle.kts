@@ -1,6 +1,8 @@
 plugins {
     java
     id("io.freefair.lombok") version "6.3.0"
+    id("nu.studer.jooq") version "7.1.1"
+    id("co.uzzu.dotenv.gradle") version "1.1.0"
 }
 
 group = "network.frostless"
@@ -66,13 +68,3 @@ dependencies {
     compileOnly("com.github.Revxrsal.Lamp:bukkit:3.0.4")
 //    compileOnly(fileTree(mapOf("dir" to "extern", "include" to listOf("*.jar"))))
 }
-
-//tasks {
-//    remap {
-//        version.set("1.18.2")
-//    //    archiveClassifier.set("remapped")
-//    }
-//    jar {
-//        dependsOn("remap")
-//    }
-//}

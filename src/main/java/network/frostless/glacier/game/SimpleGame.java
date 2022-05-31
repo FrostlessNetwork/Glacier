@@ -6,6 +6,7 @@ import network.frostless.glacier.Glacier;
 import network.frostless.glacier.async.OffloadTask;
 import network.frostless.glacier.countdown.CountdownManager;
 import network.frostless.glacier.countdown.GameCountdown;
+import network.frostless.glacier.countdown.impl.DefaultGameStartCountdown;
 import network.frostless.glacier.countdown.impl.GameStartCountdown;
 import network.frostless.glacier.game.events.DefaultGameEventManager;
 import network.frostless.glacierapi.game.event.GameEvent;
@@ -21,9 +22,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Data
 public abstract class SimpleGame<U extends GameUser, T extends Team<U>> implements Game<U, T> {
@@ -63,7 +66,7 @@ public abstract class SimpleGame<U extends GameUser, T extends Team<U>> implemen
 
 
     protected void init() {
-        addCountdown(new GameStartCountdown<>(60, 1, this));
+        addCountdown(new DefaultGameStartCountdown<>(60, 1, this));
     }
 
     protected void addCountdown(GameCountdown<U, T> countdown) {
@@ -101,6 +104,10 @@ public abstract class SimpleGame<U extends GameUser, T extends Team<U>> implemen
             if (team.getPlayers().contains(player)) return team;
         }
         return null;
+    }
+
+    public @Nullable Team<U> getRandomTeam() {
+        return teams.get(ThreadLocalRandom.current().nextInt(teams.size()));
     }
 
     @Override

@@ -36,7 +36,6 @@ public interface SlimeAPI {
      */
     CompletableFuture<SlimeWorld> generateAsTemplate(@NotNull SlimeWorld templateWorld, @NotNull String nameOfWorld);
 
-
     ExecutorService getExecutor();
 
 

@@ -23,7 +23,7 @@ import java.util.concurrent.CompletableFuture;
  * @param <U> The type of {@link GameUser}
  * @param <T> The type of {@link Team}
  */
-public class GameStartCountdown<U extends GameUser, T extends Team<U>> extends GameCountdown<U, T> {
+public abstract class GameStartCountdown<U extends GameUser, T extends Team<U>> extends GameCountdown<U, T> {
 
     /**
      * Creates a new game countdown.
@@ -38,8 +38,8 @@ public class GameStartCountdown<U extends GameUser, T extends Team<U>> extends G
 
     @Override
     public void start() {
-
-        CompletableFuture<SlimeWorld> loadGameMap = Glacier.get().getWorldManager().loadMap("sw-medieval-vm");
+        final String map = "TheBridge_Castle_NGX_VM";
+        CompletableFuture<SlimeWorld> loadGameMap = Glacier.get().getWorldManager().loadMap(map);
         loadGameMap.whenComplete((world, throwable) -> {
             if (throwable != null) {
                 getGame().executePlayers(p -> p.sendMessage(Glacier.miniMessage.deserialize("<red>Failed to load map."), MessageType.SYSTEM));
@@ -55,23 +55,20 @@ public class GameStartCountdown<U extends GameUser, T extends Team<U>> extends G
                     throwable1.printStackTrace();
                     return;
                 }
+                System.out.println("Template for " + map + " generated with name " + template.getName());
                 OffloadTask.offloadSync(() -> {
-                    MapMeta meta = Glacier.get().getMapManager().getMap("sw-medieval-vm");
+                    MapMeta meta = Glacier.get().getMapManager().getMap(map);
                     getGame().setMapMeta(meta);
                     getGame().setWorld(Bukkit.getWorld(template.getName()));
-
                     getGame().applyMapMapper(meta);
-                    getGame().executeUsers(u -> {
-                        u.sendMessage("<yellow>Game is now starting!");
-                        u.setUserState(UserGameState.INGAME);
-                        OffloadTask.offloadSync(u::onStartGame);
-                    });
-                    getGame().setGameState(GameState.INGAME);
-                    getGame().start();
                 });
+                onGeneratedWorld(template);
             });
         });
     }
+
+
+    protected abstract void onGeneratedWorld(SlimeWorld world);
 
 
     @Override

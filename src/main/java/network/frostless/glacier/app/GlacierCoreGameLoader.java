@@ -45,4 +45,6 @@ public abstract class GlacierCoreGameLoader<User extends GameUser, Team extends 
 
 
     public abstract void shutdown();
+
+    public abstract void registerPreConnections();
 }

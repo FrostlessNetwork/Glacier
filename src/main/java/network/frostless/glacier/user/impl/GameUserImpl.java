@@ -34,4 +34,6 @@ public abstract class GameUserImpl<G extends Game<? extends GameUser, ? extends 
     public G getGame() {
         return (G) super.getGame();
     }
+
+
 }
